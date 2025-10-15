@@ -8,12 +8,12 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface FavoriteMoviesApi {
-    @GET("/api/favorites")
+    @GET("api/favorites")
     suspend fun getFavorites(): Response<MoviesListModel>
 
-    @POST("/api/favorites/{id}/add")
+    @POST("api/favorites/{id}/add")
     suspend fun addFavorite(@Path("id") id: Long): Response<Unit>
 
-    @DELETE("/api/favorites/{id}/delete")
+    @DELETE("api/favorites/{id}/delete")
     suspend fun deleteFavorite(@Path("id") id: Long): Response<Unit>
 }
