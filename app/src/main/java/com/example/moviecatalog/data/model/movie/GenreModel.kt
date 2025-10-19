@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GenreModel(
     val id: String,
-    val name: String? = null
+    val name: String
 )

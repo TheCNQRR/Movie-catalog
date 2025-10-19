@@ -9,6 +9,6 @@ data class UserRegisterModel(
     val name: String,
     val password: String,
     val email: String,
-    val birthDate: String?,
-    val gender: Gender?
+    val birthDate: String,
+    val gender: Gender
 )

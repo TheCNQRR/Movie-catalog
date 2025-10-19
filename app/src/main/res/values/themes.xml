@@ -1,7 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.MovieCatalog" parent="Theme.Material3.DayNight.NoActionBar">
-
     </style>
 
-    <style name="Theme.MovieCatalog" parent="Base.Theme.MovieCatalog" />
 </resources>

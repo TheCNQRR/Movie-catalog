@@ -6,17 +6,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MovieDetailsModel(
     val id: String,
-    val name: String? = null,
-    val poster: String? = null,
-    val year: Int?,
-    val country: String? = null,
-    val genres: List<GenreModel>? = null,
-    val reviews: List<ReviewModel>? = null,
-    val time: Int?,
-    val tagline: String? = null,
-    val description: String? = null,
-    val director: String? = null,
-    val budget: Int? = null,
-    val fees: Int? = null,
-    val ageLimit: Int?
+    val name: String,
+    val poster: String,
+    val year: Int,
+    val country: String,
+    val genres: List<GenreModel>,
+    val reviews: List<ReviewModel>,
+    val time: Int,
+    val tagline: String,
+    val description: String,
+    val director: String,
+    val budget: Int,
+    val fees: Int,
+    val ageLimit: Int
 )
