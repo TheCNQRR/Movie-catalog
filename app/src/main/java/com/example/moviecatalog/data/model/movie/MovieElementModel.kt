@@ -1,0 +1,14 @@
+package com.example.moviecatalog.data.model.movie
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class MovieElementModel(
+    val id: String,
+    val name: String,
+    val poster: String,
+    val year: Int,
+    val country: String,
+    val genreModels: List<GenreModel>,
+    val reviews: List<ReviewShortModel>
+)

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">movieCatalog</string>
+    <string name="login_hint">Логин</string>
+    <string name="password_hint">Пароль</string>
+    <string name="login_to_the_app">Войти</string>
+    <string name="register_in_the_app">Регистрация</string>
 </resources>
