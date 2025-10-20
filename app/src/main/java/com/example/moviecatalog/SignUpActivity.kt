@@ -12,10 +12,10 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.moviecatalog.databinding.SignInScreenBinding
+import com.example.moviecatalog.databinding.SignUpScreenBinding
 
-class SignInActivity: AppCompatActivity() {
-    private lateinit var binding: SignInScreenBinding
+class SignUpActivity : AppCompatActivity() {
+    private lateinit var binding: SignUpScreenBinding
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +25,7 @@ class SignInActivity: AppCompatActivity() {
 
         window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
-        binding = SignInScreenBinding.inflate(layoutInflater)
+        binding = SignUpScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         hideSystemBars()
