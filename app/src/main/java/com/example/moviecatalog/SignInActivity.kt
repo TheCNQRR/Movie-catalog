@@ -2,7 +2,9 @@ package com.example.moviecatalog
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -42,6 +44,28 @@ class SignInActivity: AppCompatActivity() {
             }
             false
         }
+
+        binding.registerInTheApp.setOnClickListener {
+            onButtonClick(binding.registerInTheApp)
+            val intent = Intent(this, SignUpActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
+
+    private fun onButtonClick(view: View) {
+        view.animate()
+            .scaleX(0.8f)
+            .scaleY(0.8f)
+            .setDuration(100)
+            .withEndAction {
+                view.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(100)
+                    .start()
+            }
+            .start()
     }
 
     private fun hideSystemBars() {

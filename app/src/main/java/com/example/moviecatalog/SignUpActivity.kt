@@ -2,6 +2,7 @@ package com.example.moviecatalog
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -12,7 +13,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.moviecatalog.data.model.user.Gender
 import com.example.moviecatalog.databinding.SignUpScreenBinding
+import com.example.moviecatalog.logic.AuthLogic
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: SignUpScreenBinding
@@ -41,6 +44,24 @@ class SignUpActivity : AppCompatActivity() {
                 hideKeyboardAndClearFocus()
             }
             false
+        }
+
+        binding.haveAccount.setOnClickListener {
+            val intent = Intent(this, SignInActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        binding.registerInTheApp.setOnClickListener {
+            val login = binding.login.text.toString()
+            val email = binding.email.text.toString()
+            val name = binding.name.text.toString()
+            val password = binding.password.text.toString()
+            val confirmPassword = binding.confirmPassword.text.toString()
+            val birthDate = binding.birthDate.text.toString()
+            val gender = 0 //TODO кнопка выбора пола
+
+            AuthLogic.registerUser(login, email, name, password, confirmPassword, birthDate, gender)
         }
     }
 
