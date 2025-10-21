@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.moviecatalog.databinding.SignInScreenBinding
+import com.example.moviecatalog.logic.AuthLogic
 
 class SignInActivity: AppCompatActivity() {
     private lateinit var binding: SignInScreenBinding
@@ -50,6 +51,15 @@ class SignInActivity: AppCompatActivity() {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
             finish()
+        }
+
+        binding.loginToTheApp.setOnClickListener {
+            val userName = binding.signInLoginInput.text.toString()
+            val password = binding.signInLoginPassword.text.toString()
+
+            val authLogic = AuthLogic()
+
+            authLogic.login(userName, password)
         }
     }
 

@@ -2,6 +2,7 @@ package com.example.moviecatalog.logic
 
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.data.model.Token
+import com.example.moviecatalog.data.model.auth.LoginCredentials
 import com.example.moviecatalog.data.model.auth.UserRegisterModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,18 @@ class AuthLogic {
         CoroutineScope(Dispatchers.IO).launch {
             response = authApi.register(user)
             token = response.accessToken
+        }
+    }
+
+    fun login(userName: String, password: String) {
+        val loginCredentials = LoginCredentials(userName, password)
+
+        var response: Token
+
+        CoroutineScope(Dispatchers.IO).launch {
+            response = authApi.login(loginCredentials)
+            token = response.accessToken
+            println(token)
         }
     }
 }
