@@ -61,7 +61,9 @@ class SignUpActivity : AppCompatActivity() {
             val birthDate = binding.birthDate.text.toString()
             val gender = 0 //TODO кнопка выбора пола
 
-            AuthLogic.registerUser(login, email, name, password, confirmPassword, birthDate, gender)
+            val authLogic = AuthLogic()
+
+            authLogic.registerUser(login, email, name, password, confirmPassword, birthDate, gender)
         }
     }
 

@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object AuthLogic {
+class AuthLogic {
     private var token = ""
     private val authApi = RetrofitClient.getAuthApi()
 
