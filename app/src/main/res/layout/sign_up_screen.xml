@@ -202,27 +202,47 @@
             app:layout_constraintTop_toBottomOf="@+id/confirm_password"
             android:layout_marginTop="16dp"/>
 
-        <EditText
-            android:id="@+id/gender"
+        <RadioGroup
+            android:id="@+id/gender_selector"
             android:layout_width="0dp"
             app:layout_constraintWidth_max="400dp"
             android:layout_height="52dp"
+            android:layout_marginTop="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:background="@drawable/authorization_border"
-            android:ems="10"
-            android:fontFamily="@font/ibm_plex_sans_regular"
-            android:hint="@string/male"
-            android:inputType="textNoSuggestions"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:gravity="center_vertical"
-            android:textColor="@color/gray_faded"
-            android:textColorHint="@color/gray"
+            android:background="@drawable/gender_selector_background"
+            android:divider="@drawable/gender_divider"
+            android:showDividers="middle"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/birth_date"
-            android:layout_marginTop="16dp"/>
+            app:layout_constraintTop_toBottomOf="@+id/birth_date">
+
+            <RadioButton
+                android:id="@+id/male"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/gender_left_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:text="Мужчина"
+                android:textColor="@color/gray"
+                android:textSize="16sp"/>
+
+            <RadioButton
+                android:id="@+id/female"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/gender_right_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:text="Женщина"
+                android:textColor="@color/gray"
+                android:textSize="16sp"/>
+
+        </RadioGroup>
 
         <TextView
             android:id="@+id/register_in_the_app"

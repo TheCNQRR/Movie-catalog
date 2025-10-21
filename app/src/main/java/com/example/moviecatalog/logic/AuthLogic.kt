@@ -11,12 +11,12 @@ class AuthLogic {
     private var token = ""
     private val authApi = RetrofitClient.getAuthApi()
 
-    fun registerUser(login: String, email: String, name: String, password: String, confirmPassword: String, birthDate: String, gender: Int) {
+    fun registerUser(login: String, email: String, name: String, password: String, confirmPassword: String, birthDate: String, gender: Int?) {
         if (password != confirmPassword) {
             println("Error") //TODO валидация (не только пароля)
         }
 
-        val user = UserRegisterModel(login, name, password, email, birthDate, gender)
+        val user = UserRegisterModel(login, name, password, email, birthDate, gender!!)
 
         var response: Token
 

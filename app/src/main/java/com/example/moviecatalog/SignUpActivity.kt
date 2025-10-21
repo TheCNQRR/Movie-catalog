@@ -13,7 +13,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.moviecatalog.data.model.user.Gender
 import com.example.moviecatalog.databinding.SignUpScreenBinding
 import com.example.moviecatalog.logic.AuthLogic
 
@@ -59,7 +58,11 @@ class SignUpActivity : AppCompatActivity() {
             val password = binding.password.text.toString()
             val confirmPassword = binding.confirmPassword.text.toString()
             val birthDate = binding.birthDate.text.toString()
-            val gender = 0 //TODO кнопка выбора пола
+            val gender = when ( binding.genderSelector.checkedRadioButtonId) {
+                R.id.male -> 0
+                R.id.female -> 1
+                else -> null
+            }
 
             val authLogic = AuthLogic()
 
