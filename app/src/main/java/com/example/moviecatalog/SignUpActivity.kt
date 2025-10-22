@@ -58,6 +58,7 @@ class SignUpActivity : AppCompatActivity() {
                 MaterialDatePicker.Builder.datePicker()
                     .setTitleText("Select date")
                     .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                    .setTheme(R.style.ThemeOverlay_MovieCatalog_DatePicker)
                     .build()
 
             datePicker.show(supportFragmentManager, "DATE_PICKER_TAG")
