@@ -202,6 +202,16 @@
             app:layout_constraintTop_toBottomOf="@+id/confirm_password"
             android:layout_marginTop="16dp"/>
 
+        <ImageView
+            android:id="@+id/calendar"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginRight="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/birth_date"
+            app:layout_constraintEnd_toEndOf="@+id/birth_date"
+            app:layout_constraintTop_toTopOf="@+id/birth_date"
+            app:srcCompat="@drawable/calendar" />
+
         <RadioGroup
             android:id="@+id/gender_selector"
             android:layout_width="0dp"
