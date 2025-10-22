@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.icu.util.Calendar
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -82,6 +84,8 @@ class SignUpActivity : AppCompatActivity() {
             }
         }
 
+        setupTextWatcher()
+
         binding.registerInTheApp.setOnClickListener {
             val login = binding.login.text.toString()
             val email = binding.email.text.toString()
@@ -109,6 +113,48 @@ class SignUpActivity : AppCompatActivity() {
             )
 
             authLogic.registerUser(login, email, name, password, confirmPassword, birthDate, gender)
+        }
+    }
+
+    private fun isAllFieldsFilled(): Boolean {
+        return binding.login.text.toString().isNotEmpty() &&
+                binding.email.text.toString().isNotEmpty() &&
+                binding.name.text.toString().isNotEmpty() &&
+                binding.password.text.toString().isNotEmpty() &&
+                binding.confirmPassword.text.toString().isNotEmpty() &&
+                binding.birthDate.text.toString().isNotEmpty() &&
+                binding.genderSelector.checkedRadioButtonId != -1
+    }
+
+    private fun checkFieldsAndUpdateButton() {
+        val allFieldsFilled = isAllFieldsFilled()
+
+        if (allFieldsFilled) {
+            binding.registerInTheApp.setBackgroundColor(getColor(R.color.accent))
+            binding.registerInTheApp.setTextColor(getColor(R.color.white))
+        } else {
+            binding.registerInTheApp.setBackgroundResource(R.drawable.authorization_button_border)
+            binding.registerInTheApp.setTextColor(getColor(R.color.accent))
+        }
+    }
+
+    private fun setupTextWatcher() {
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                checkFieldsAndUpdateButton()
+            }
+        }
+
+        binding.login.addTextChangedListener(textWatcher)
+        binding.email.addTextChangedListener(textWatcher)
+        binding.name.addTextChangedListener(textWatcher)
+        binding.password.addTextChangedListener(textWatcher)
+        binding.confirmPassword.addTextChangedListener(textWatcher)
+        binding.birthDate.addTextChangedListener(textWatcher)
+        binding.genderSelector.setOnCheckedChangeListener { _, _ ->
+            checkFieldsAndUpdateButton()
         }
     }
 
