@@ -16,6 +16,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.moviecatalog.databinding.SignUpScreenBinding
 import com.example.moviecatalog.logic.AuthLogic
+import com.google.android.material.datepicker.MaterialDatePicker
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: SignUpScreenBinding
@@ -50,6 +51,16 @@ class SignUpActivity : AppCompatActivity() {
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
             finish()
+        }
+
+        binding.birthDate.setOnClickListener {
+            val datePicker =
+                MaterialDatePicker.Builder.datePicker()
+                    .setTitleText("Select date")
+                    .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                    .build()
+
+            datePicker.show(supportFragmentManager, "DATE_PICKER_TAG")
         }
 
         binding.registerInTheApp.setOnClickListener {
