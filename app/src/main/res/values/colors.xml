@@ -6,4 +6,5 @@
     <color name="gray">#B7B7B7</color>
     <color name="gray_faded">#D1D1D1</color>
     <color name="accent">#EF3A01</color>
+    <color name="error">#BD0000</color>
 </resources>

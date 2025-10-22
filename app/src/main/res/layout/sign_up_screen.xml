@@ -226,7 +226,7 @@
                 android:background="@drawable/gender_left_selector"
                 android:button="@null"
                 android:gravity="center"
-                android:text="Мужчина"
+                android:text="@string/male"
                 android:textColor="@color/gray"
                 android:textSize="16sp"/>
 
@@ -238,11 +238,28 @@
                 android:background="@drawable/gender_right_selector"
                 android:button="@null"
                 android:gravity="center"
-                android:text="Женщина"
+                android:text="@string/female"
                 android:textColor="@color/gray"
                 android:textSize="16sp"/>
-
         </RadioGroup>
+
+        <TextView
+            android:id="@+id/error_message"
+            android:layout_width="0dp"
+            app:layout_constraintWidth_max="400dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gender_selector"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:text="@string/error"
+            android:fontFamily="@font/ibm_plex_sans_regular"
+            android:textSize="18sp"
+            android:textColor="@color/error"
+            android:visibility="gone"
+            />
 
         <TextView
             android:id="@+id/register_in_the_app"

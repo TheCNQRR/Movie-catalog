@@ -2,29 +2,89 @@ package com.example.moviecatalog.logic
 
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.data.model.Token
+import com.example.moviecatalog.data.model.TokenStorage
 import com.example.moviecatalog.data.model.auth.LoginCredentials
 import com.example.moviecatalog.data.model.auth.UserRegisterModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class AuthLogic {
-    private var token = ""
+class AuthLogic(
+    private val onClearErrors: () -> Unit = {},
+    private val onApiSuccess: () -> Unit = {},
+    private val onError: (String) -> Unit = {}
+) {
     private val authApi = RetrofitClient.getAuthApi()
 
     fun registerUser(login: String, email: String, name: String, password: String, confirmPassword: String, birthDate: String, gender: Int?) {
-        if (password != confirmPassword) {
-            println("Error") //TODO валидация (не только пароля)
+        onClearErrors()
+
+        if (login == "") {
+            onError("Заполните логин!")
+            return
         }
 
-        val user = UserRegisterModel(login, name, password, email, birthDate, gender!!)
+        if (email == "") {
+            onError("Заполните почту!")
+            return
+        }
+
+        if (name == "") {
+            onError("Заполните имя!")
+            return
+        }
+
+        if (password == "") {
+            onError("Заполните пароль!")
+            return
+        }
+
+        if (password.length < 6) {
+            onError("Пароль должен содержать хотя бы 6 символов!")
+            return
+        }
+
+        if (birthDate == "") {
+            onError("Заполните дату рождения!")
+            return
+        }
+
+        if (gender == null) {
+            onError("Укажите пол!")
+            return
+        }
+
+        if (!isValidLogin(login)) {
+            onError("Логин может содержать только буквы и цифры")
+            return
+        }
+
+        if (!isValidEmail(email)) {
+            onError("Почта не соответствует формату")
+            return
+        }
+
+        if (password != confirmPassword) {
+            onError("Пароли не совпадают")
+            return
+        }
+
+        val user = UserRegisterModel(login, name, password, email, birthDate, gender)
 
         var response: Token
 
         CoroutineScope(Dispatchers.IO).launch {
             response = authApi.register(user)
-            token = response.accessToken
+            TokenStorage.saveToken(response.accessToken)
         }
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        return email.matches(Regex("([A-Za-z]+([0-9]|[A-Za-z])*([.|\\-_]([0-9]|[A-Za-z])*)*)@[A-Za-z]+\\.[A-Za-z]+"))
+    }
+
+    private fun isValidLogin(login: String): Boolean {
+        return login.matches(Regex("[A-Za-z|0-9]+"))
     }
 
     fun login(userName: String, password: String) {
@@ -34,8 +94,7 @@ class AuthLogic {
 
         CoroutineScope(Dispatchers.IO).launch {
             response = authApi.login(loginCredentials)
-            token = response.accessToken
-            println(token)
+            TokenStorage.saveToken(response.accessToken)
         }
     }
 }

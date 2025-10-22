@@ -12,4 +12,7 @@
     <string name="birth_date">Дата рождения</string>
     <string name="male">Мужчина</string>
     <string name="female">Женщина</string>
+    <string name="passwords_not_match">Пароли не совпадают</string>
+    <string name="wrong_login">Неверное имя пользователя</string>
+    <string name="error">Ошибка</string>
 </resources>

@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -64,7 +66,18 @@ class SignUpActivity : AppCompatActivity() {
                 else -> null
             }
 
-            val authLogic = AuthLogic()
+            val authLogic = AuthLogic(
+                onError = { message ->
+                    binding.errorMessage.text = message
+                    binding.errorMessage.visibility = View.VISIBLE
+                },
+                onClearErrors = { binding.errorMessage.visibility = View.GONE },
+                onApiSuccess = {
+                    val intent = Intent(this, SignInActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+            )
 
             authLogic.registerUser(login, email, name, password, confirmPassword, birthDate, gender)
         }
