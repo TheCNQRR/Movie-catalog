@@ -8,10 +8,12 @@ import com.example.moviecatalog.data.model.auth.UserRegisterModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Response
 
 class AuthLogic(
     private val onClearErrors: () -> Unit = {},
-    private val onApiSuccess: () -> Unit = {},
+    private val onSuccess: () -> Unit = {},
     private val onError: (String) -> Unit = {}
 ) {
     private val authApi = RetrofitClient.getAuthApi()
@@ -71,11 +73,30 @@ class AuthLogic(
 
         val user = UserRegisterModel(login, name, password, email, birthDate, gender)
 
-        var response: Token
+        var response: Response<Token>
 
         CoroutineScope(Dispatchers.IO).launch {
             response = authApi.register(user)
-            TokenStorage.saveToken(response.accessToken)
+
+            if (response.isSuccessful) {
+                val tokenResponse = response.body()
+                val token = tokenResponse?.accessToken ?: ""
+                TokenStorage.saveToken(token)
+
+                withContext(Dispatchers.Main) {
+                    onSuccess()
+                }
+            }
+
+            else {
+                withContext(Dispatchers.Main) {
+                    when (response.code()) {
+                        400 -> onError("Проверьте правильность заполнения полей или попробуйте другой логин")
+                        500 -> onError("Ошибка сервера")
+                        else -> onError("Ошибка ${response.code()}")
+                    }
+                }
+            }
         }
     }
 
