@@ -1,6 +1,6 @@
 package com.example.moviecatalog.logic
 
-import com.example.moviecatalog.data.api.RetrofitClient
+import com.example.moviecatalog.data.api.AuthApi
 import com.example.moviecatalog.data.model.Token
 import com.example.moviecatalog.data.model.TokenStorage
 import com.example.moviecatalog.data.model.auth.LoginCredentials
@@ -12,12 +12,11 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 class AuthLogic(
+    private val authApi: AuthApi,
     private val onClearErrors: () -> Unit = {},
     private val onSuccess: () -> Unit = {},
     private val onError: (String) -> Unit = {}
 ) {
-    private val authApi = RetrofitClient.getAuthApi()
-
     fun registerUser(login: String, email: String, name: String, password: String, confirmPassword: String, birthDate: String, gender: Int?) {
         onClearErrors()
 

@@ -17,6 +17,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.databinding.SignUpScreenBinding
 import com.example.moviecatalog.logic.AuthLogic
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -103,6 +104,7 @@ class SignUpActivity : AppCompatActivity() {
             onButtonClick(binding.registerInTheApp)
 
             val authLogic = AuthLogic(
+                authApi = RetrofitClient.getAuthApi(),
                 onError = { message ->
                     binding.errorMessage.text = message
                     binding.errorMessage.visibility = View.VISIBLE
