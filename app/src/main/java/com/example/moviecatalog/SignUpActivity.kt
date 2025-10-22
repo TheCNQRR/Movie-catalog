@@ -52,6 +52,7 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         binding.haveAccount.setOnClickListener {
+            onButtonClick(binding.haveAccount)
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
             finish()
@@ -98,6 +99,8 @@ class SignUpActivity : AppCompatActivity() {
                 R.id.female -> 1
                 else -> null
             }
+
+            onButtonClick(binding.registerInTheApp)
 
             val authLogic = AuthLogic(
                 onError = { message ->
@@ -156,6 +159,21 @@ class SignUpActivity : AppCompatActivity() {
         binding.genderSelector.setOnCheckedChangeListener { _, _ ->
             checkFieldsAndUpdateButton()
         }
+    }
+
+    private fun onButtonClick(view: View) {
+        view.animate()
+            .scaleX(0.8f)
+            .scaleY(0.8f)
+            .setDuration(100)
+            .withEndAction {
+                view.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(100)
+                    .start()
+            }
+            .start()
     }
 
     private fun hideSystemBars() {

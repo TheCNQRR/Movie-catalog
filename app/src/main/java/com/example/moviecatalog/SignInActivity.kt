@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -53,9 +55,13 @@ class SignInActivity: AppCompatActivity() {
             finish()
         }
 
+        setupTextWatcher()
+
         binding.loginToTheApp.setOnClickListener {
-            val userName = binding.signInLoginInput.text.toString()
+            val login = binding.signInLoginInput.text.toString()
             val password = binding.signInLoginPassword.text.toString()
+
+            onButtonClick(binding.loginToTheApp)
 
             val authLogic = AuthLogic(
                 onError = { message ->
@@ -63,11 +69,41 @@ class SignInActivity: AppCompatActivity() {
                     binding.errorMessage.visibility = View.VISIBLE
                 },
                 onClearErrors = { binding.errorMessage.visibility = View.GONE },
-                onSuccess = { println("Успешный вхо") }
+                onSuccess = { println("Успешный вход") }
             )
 
-            authLogic.login(userName, password)
+            authLogic.login(login, password)
         }
+    }
+
+    private fun isAllFieldsFilled(): Boolean {
+        return binding.signInLoginInput.text.toString().isNotEmpty() &&
+                binding.signInLoginPassword.text.toString().isNotEmpty()
+    }
+
+    private fun checkFieldsAndUpdateButton() {
+        val allFieldsFilled = isAllFieldsFilled()
+
+        if (allFieldsFilled) {
+            binding.loginToTheApp.setBackgroundColor(getColor(R.color.accent))
+            binding.loginToTheApp.setTextColor(getColor(R.color.white))
+        } else {
+            binding.loginToTheApp.setBackgroundResource(R.drawable.authorization_button_border)
+            binding.loginToTheApp.setTextColor(getColor(R.color.accent))
+        }
+    }
+
+    private fun setupTextWatcher() {
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                checkFieldsAndUpdateButton()
+            }
+        }
+
+        binding.signInLoginInput.addTextChangedListener(textWatcher)
+        binding.signInLoginPassword.addTextChangedListener(textWatcher)
     }
 
     private fun onButtonClick(view: View) {
