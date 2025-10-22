@@ -57,7 +57,14 @@ class SignInActivity: AppCompatActivity() {
             val userName = binding.signInLoginInput.text.toString()
             val password = binding.signInLoginPassword.text.toString()
 
-            val authLogic = AuthLogic()
+            val authLogic = AuthLogic(
+                onError = { message ->
+                    binding.errorMessage.text = message
+                    binding.errorMessage.visibility = View.VISIBLE
+                },
+                onClearErrors = { binding.errorMessage.visibility = View.GONE },
+                onSuccess = { println("Успешный вхо") }
+            )
 
             authLogic.login(userName, password)
         }

@@ -87,7 +87,6 @@ class AuthLogic(
                     onSuccess()
                 }
             }
-
             else {
                 withContext(Dispatchers.Main) {
                     when (response.code()) {
@@ -108,14 +107,44 @@ class AuthLogic(
         return login.matches(Regex("[A-Za-z|0-9]+"))
     }
 
-    fun login(userName: String, password: String) {
-        val loginCredentials = LoginCredentials(userName, password)
+    fun login(login: String, password: String) {
+        onClearErrors()
 
-        var response: Token
+        if (login == "") {
+            onError("Заполните логин!")
+            return
+        }
+
+        if (password == "") {
+            onError("Заполните пароль!")
+            return
+        }
+
+        val loginCredentials = LoginCredentials(login, password)
+
+        var response: Response<Token>
 
         CoroutineScope(Dispatchers.IO).launch {
             response = authApi.login(loginCredentials)
-            TokenStorage.saveToken(response.accessToken)
+
+            if (response.isSuccessful) {
+                val tokenResponse = response.body()
+                val token = tokenResponse?.accessToken ?: ""
+                TokenStorage.saveToken(token)
+
+                withContext(Dispatchers.Main) {
+                    onSuccess()
+                }
+            }
+            else {
+                withContext(Dispatchers.Main) {
+                    when (response.code()) {
+                        400 -> onError("Неверные логин или пароль")
+                        500 -> onError("Ошибка сервера")
+                        else -> onError("Ошибка ${response.code()}")
+                    }
+                }
+            }
         }
     }
 }

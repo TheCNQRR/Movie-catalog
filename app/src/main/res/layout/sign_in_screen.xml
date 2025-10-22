@@ -12,7 +12,7 @@
         android:id="@+id/auth_screen_logo_name"
         android:layout_width="250dp"
         android:layout_height="170dp"
-        app:layout_constraintBottom_toTopOf="@+id/signInLoginInput"
+        app:layout_constraintBottom_toTopOf="@+id/sign_in_login_input"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,7 +36,7 @@
         app:srcCompat="@drawable/app_name" />
 
     <EditText
-        android:id="@+id/signInLoginInput"
+        android:id="@+id/sign_in_login_input"
         android:layout_width="0dp"
         app:layout_constraintWidth_max="400dp"
         android:layout_height="52dp"
@@ -59,7 +59,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/signInLoginPassword"
+        android:id="@+id/sign_in_login_password"
         android:layout_width="0dp"
         app:layout_constraintWidth_max="400dp"
         android:layout_height="52dp"
@@ -79,7 +79,24 @@
         android:paddingBottom="13dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signInLoginInput" />
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_login_input" />
+
+    <TextView
+        android:id="@+id/error_message"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_max="400dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_login_password"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:text="@string/wrong_login_or_password"
+        android:fontFamily="@font/ibm_plex_sans_regular"
+        android:textSize="18sp"
+        android:textColor="@color/error"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/login_to_the_app"

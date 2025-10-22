@@ -13,7 +13,7 @@ interface AuthApi {
     suspend fun register(@Body body: UserRegisterModel): Response<Token>
 
     @POST("api/account/login")
-    suspend fun login(@Body body: LoginCredentials): Token
+    suspend fun login(@Body body: LoginCredentials): Response<Token>
 
     @POST("api/account/logout")
     suspend fun logout(): LogoutResponse
