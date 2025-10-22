@@ -85,8 +85,8 @@ class SignInActivity: AppCompatActivity() {
         val allFieldsFilled = isAllFieldsFilled()
 
         if (allFieldsFilled) {
-            binding.loginToTheApp.setBackgroundColor(getColor(R.color.accent))
             binding.loginToTheApp.setTextColor(getColor(R.color.white))
+            binding.loginToTheApp.setBackgroundResource(R.drawable.active_button)
         } else {
             binding.loginToTheApp.setBackgroundResource(R.drawable.authorization_button_border)
             binding.loginToTheApp.setTextColor(getColor(R.color.accent))

@@ -133,7 +133,7 @@ class SignUpActivity : AppCompatActivity() {
         val allFieldsFilled = isAllFieldsFilled()
 
         if (allFieldsFilled) {
-            binding.registerInTheApp.setBackgroundColor(getColor(R.color.accent))
+            binding.registerInTheApp.setBackgroundResource(R.drawable.active_button)
             binding.registerInTheApp.setTextColor(getColor(R.color.white))
         } else {
             binding.registerInTheApp.setBackgroundResource(R.drawable.authorization_button_border)
