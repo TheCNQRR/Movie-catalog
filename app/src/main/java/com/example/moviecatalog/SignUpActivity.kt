@@ -3,6 +3,7 @@ package com.example.moviecatalog
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -20,6 +21,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: SignUpScreenBinding
+    private var selectedBirthDate: String = ""
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,8 +62,24 @@ class SignUpActivity : AppCompatActivity() {
                     .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                     .setTheme(R.style.ThemeOverlay_MovieCatalog_DatePicker)
                     .build()
-
             datePicker.show(supportFragmentManager, "DATE_PICKER_TAG")
+
+
+            datePicker.addOnPositiveButtonClickListener { selectedDate ->
+                val calendar = Calendar.getInstance().apply {
+                    timeInMillis = selectedDate
+                }
+                val day = calendar.get(Calendar.DAY_OF_MONTH)
+                val month = calendar.get(Calendar.MONTH) + 1
+                val year = calendar.get(Calendar.YEAR)
+
+                val date = "$day.$month.$year"
+                binding.birthDate.text = date
+
+                val apiDate = "${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T00:00:00.000Z"
+
+                selectedBirthDate = apiDate
+            }
         }
 
         binding.registerInTheApp.setOnClickListener {
@@ -70,7 +88,7 @@ class SignUpActivity : AppCompatActivity() {
             val name = binding.name.text.toString()
             val password = binding.password.text.toString()
             val confirmPassword = binding.confirmPassword.text.toString()
-            val birthDate = binding.birthDate.text.toString()
+            val birthDate = selectedBirthDate
             val gender = when ( binding.genderSelector.checkedRadioButtonId) {
                 R.id.male -> 0
                 R.id.female -> 1
