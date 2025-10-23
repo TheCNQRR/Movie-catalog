@@ -1,4 +1,4 @@
-package com.example.moviecatalog
+package com.example.moviecatalog.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -16,6 +16,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.databinding.SignInScreenBinding
 import com.example.moviecatalog.logic.AuthLogic

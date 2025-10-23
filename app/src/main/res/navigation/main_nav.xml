@@ -7,12 +7,12 @@
 
     <activity
         android:id="@+id/signInActivity"
-        android:name="com.example.moviecatalog.SignInActivity"
+        android:name="com.example.moviecatalog.ui.SignInActivity"
         android:label="sign_in_screen"
         tools:layout="@layout/sign_in_screen" />
     <activity
         android:id="@+id/signUpActivity"
-        android:name="com.example.moviecatalog.SignUpActivity"
+        android:name="com.example.moviecatalog.ui.SignUpActivity"
         android:label="sign_up_screen"
         tools:layout="@layout/sign_up_screen" />
 </navigation>
