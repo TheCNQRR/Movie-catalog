@@ -1,5 +1,7 @@
-package com.example.moviecatalog.logic;
+package com.example.moviecatalog.logic
 
+import android.content.Context
+import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.MovieApi;
 import com.example.moviecatalog.data.model.movie.MoviesPagedListModel
 import kotlinx.coroutines.CoroutineScope
@@ -8,7 +10,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 
-class MainScreenLogic(private val movieApi: MovieApi,
+class MoviesLogic(
+    private val context: Context,
+    private val movieApi: MovieApi,
     private val onMoviesLoad: (MoviesPagedListModel) -> Unit,
     private val onError: (String) -> Unit = {}) {
     fun getMovies(page: Int) {
@@ -25,13 +29,13 @@ class MainScreenLogic(private val movieApi: MovieApi,
                         onMoviesLoad(movies)
                     }
                     else {
-                        onError("Пустой ответ от сервера")
+                        onError(context.getString(R.string.empty_answer_from_server))
                     }
                 }
             }
             else {
                 withContext(Dispatchers.Main) {
-                   onError("Ошибка")
+                   onError(context.getString(R.string.error))
                 }
             }
         }

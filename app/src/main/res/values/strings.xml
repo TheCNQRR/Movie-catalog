@@ -29,4 +29,5 @@
     <string name="select_date">Select date</string>
     <string name="check_fields_are_correct">Проверьте правильность заполнения полей или попробуйте другой логин</string>
     <string name="server_error">Ошибка сервера</string>
+    <string name="empty_answer_from_server">Пустой ответ от сервера></string>
 </resources>

@@ -20,9 +20,12 @@ import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.databinding.SignInScreenBinding
 import com.example.moviecatalog.logic.AuthLogic
+import com.example.moviecatalog.logic.util.Validator
 
 class SignInActivity: AppCompatActivity() {
     private lateinit var binding: SignInScreenBinding
+    private val effects = Effects()
+    private val validator = Validator(this)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +54,7 @@ class SignInActivity: AppCompatActivity() {
         }
 
         binding.registerInTheApp.setOnClickListener {
-            onButtonClick(binding.registerInTheApp)
+            effects.onButtonClick(binding.registerInTheApp)
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
             finish()
@@ -63,7 +66,7 @@ class SignInActivity: AppCompatActivity() {
             val login = binding.signInLoginInput.text.toString()
             val password = binding.signInLoginPassword.text.toString()
 
-            onButtonClick(binding.loginToTheApp)
+            effects.onButtonClick(binding.loginToTheApp)
 
             val authLogic = AuthLogic(
                 authApi = RetrofitClient.getAuthApi(),
@@ -80,13 +83,11 @@ class SignInActivity: AppCompatActivity() {
         }
     }
 
-    private fun isAllFieldsFilled(): Boolean {
-        return binding.signInLoginInput.text.toString().isNotEmpty() &&
-                binding.signInLoginPassword.text.toString().isNotEmpty()
-    }
-
     private fun checkFieldsAndUpdateButton() {
-        val allFieldsFilled = isAllFieldsFilled()
+        val login = binding.signInLoginInput.text.toString()
+        val password = binding.signInLoginPassword.text.toString()
+
+        val allFieldsFilled = validator.isAllFieldsFilledLogin(login, password)
 
         if (allFieldsFilled) {
             binding.loginToTheApp.setTextColor(getColor(R.color.white))
@@ -108,21 +109,6 @@ class SignInActivity: AppCompatActivity() {
 
         binding.signInLoginInput.addTextChangedListener(textWatcher)
         binding.signInLoginPassword.addTextChangedListener(textWatcher)
-    }
-
-    private fun onButtonClick(view: View) {
-        view.animate()
-            .scaleX(0.8f)
-            .scaleY(0.8f)
-            .setDuration(100)
-            .withEndAction {
-                view.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(100)
-                    .start()
-            }
-            .start()
     }
 
     private fun hideSystemBars() {

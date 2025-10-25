@@ -21,11 +21,14 @@ import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.databinding.SignUpScreenBinding
 import com.example.moviecatalog.logic.AuthLogic
+import com.example.moviecatalog.logic.util.Validator
 import com.google.android.material.datepicker.MaterialDatePicker
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: SignUpScreenBinding
     private var selectedBirthDate: String = ""
+    private val effects = Effects()
+    private val validator = Validator(this)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +57,7 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         binding.haveAccount.setOnClickListener {
-            onButtonClick(binding.haveAccount)
+            effects.onButtonClick(binding.haveAccount)
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
             finish()
@@ -102,7 +105,7 @@ class SignUpActivity : AppCompatActivity() {
                 else -> null
             }
 
-            onButtonClick(binding.registerInTheApp)
+            effects.onButtonClick(binding.registerInTheApp)
 
             val authLogic = AuthLogic(
                 authApi = RetrofitClient.getAuthApi(),
@@ -123,18 +126,16 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun isAllFieldsFilled(): Boolean {
-        return binding.login.text.toString().isNotEmpty() &&
-                binding.email.text.toString().isNotEmpty() &&
-                binding.name.text.toString().isNotEmpty() &&
-                binding.password.text.toString().isNotEmpty() &&
-                binding.confirmPassword.text.toString().isNotEmpty() &&
-                binding.birthDate.text.toString().isNotEmpty() &&
-                binding.genderSelector.checkedRadioButtonId != -1
-    }
-
     private fun checkFieldsAndUpdateButton() {
-        val allFieldsFilled = isAllFieldsFilled()
+        val login = binding.login.text.toString()
+        val email = binding.email.text.toString()
+        val name = binding.name.text.toString()
+        val password = binding.password.text.toString()
+        val confirmPassword = binding.confirmPassword.text.toString()
+        val birthDate = binding.birthDate.text.toString()
+        val genderId = binding.genderSelector.checkedRadioButtonId
+
+        val allFieldsFilled = validator.isAllFieldsFilledRegistration(login, email, name, password, confirmPassword, birthDate, genderId)
 
         if (allFieldsFilled) {
             binding.registerInTheApp.setBackgroundResource(R.drawable.active_button)
@@ -160,24 +161,7 @@ class SignUpActivity : AppCompatActivity() {
         binding.password.addTextChangedListener(textWatcher)
         binding.confirmPassword.addTextChangedListener(textWatcher)
         binding.birthDate.addTextChangedListener(textWatcher)
-        binding.genderSelector.setOnCheckedChangeListener { _, _ ->
-            checkFieldsAndUpdateButton()
-        }
-    }
-
-    private fun onButtonClick(view: View) {
-        view.animate()
-            .scaleX(0.8f)
-            .scaleY(0.8f)
-            .setDuration(100)
-            .withEndAction {
-                view.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(100)
-                    .start()
-            }
-            .start()
+        binding.genderSelector.setOnCheckedChangeListener { _, _ -> checkFieldsAndUpdateButton() }
     }
 
     private fun hideSystemBars() {
