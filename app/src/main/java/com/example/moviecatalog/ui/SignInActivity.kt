@@ -67,12 +67,13 @@ class SignInActivity: AppCompatActivity() {
 
             val authLogic = AuthLogic(
                 authApi = RetrofitClient.getAuthApi(),
+                context = this,
                 onError = { message ->
                     binding.errorMessage.text = message
                     binding.errorMessage.visibility = View.VISIBLE
                 },
                 onClearErrors = { binding.errorMessage.visibility = View.GONE },
-                onSuccess = { println("Успешный вход") }
+                onSuccess = { println(getString(R.string.success_login)) }
             )
 
             authLogic.login(login, password)

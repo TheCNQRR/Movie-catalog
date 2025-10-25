@@ -1,20 +1,21 @@
 package com.example.moviecatalog.logic.util
 
 import android.content.Context
+import com.example.moviecatalog.R
 
-class Validator() {
+class Validator(private val context: Context) {
     fun validateRegistration(login: String, email: String, name: String, password: String, confirmPassword: String, birthDate: String, gender: Int?): String? {
         val loginError = isValidLogin(login)
         return when {
             loginError != null -> loginError
-            email.isBlank() -> "Заполните почту!"
-            name.isBlank() -> "Заполните имя!"
-            password.isBlank() -> "Заполните пароль!"
-            password.length < 6 -> "Пароль должен содержать хотя бы 6 символов!"
-            birthDate.isBlank() -> "Заполните дату рождения!"
-            gender == null -> "Укажите пол!"
-            !isValidEmail(email) -> "Почта не соответствует формату"
-            password != confirmPassword -> "Пароли не совпадают"
+            email.isBlank() -> context.getString(R.string.fill_email)
+            name.isBlank() -> context.getString(R.string.fill_name)
+            password.isBlank() -> context.getString(R.string.fill_password)
+            password.length < 6 -> context.getString(R.string.password_too_short)
+            birthDate.isBlank() -> context.getString(R.string.fill_birth_date)
+            gender == null -> context.getString(R.string.select_gender)
+            !isValidEmail(email) -> context.getString(R.string.incorrect_email)
+            password != confirmPassword -> context.getString(R.string.passwords_not_match)
             else -> null
         }
     }
@@ -22,7 +23,7 @@ class Validator() {
     fun validateLogin(login: String, password: String): String? {
         val passwordError = isValidPassword(password)
         return when {
-            login.isBlank() -> "Заполните логин!"
+            login.isBlank() -> context.getString(R.string.fill_login)
             passwordError != null -> passwordError
             else -> null
         }
@@ -30,8 +31,8 @@ class Validator() {
 
     private fun isValidLogin(login: String): String? {
         return when {
-            login.isBlank() -> "Заполните логин!"
-            !login.matches(Regex("[A-Za-z|0-9]+")) -> "Логин может содержать только буквы и цифры"
+            login.isBlank() -> context.getString(R.string.fill_login)
+            !login.matches(Regex("[A-Za-z|0-9]+")) -> context.getString(R.string.incorrect_login)
             else -> null
         }
     }
@@ -42,8 +43,8 @@ class Validator() {
 
     private fun isValidPassword(password: String): String? {
         return when {
-            password.isBlank() -> "Заполните пароль!"
-            password.length < 6 -> "Пароль должен содержать хотя бы 6 символов!"
+            password.isBlank() -> context.getString(R.string.fill_password)
+            password.length < 6 -> context.getString(R.string.password_too_short)
             else -> null
         }
     }

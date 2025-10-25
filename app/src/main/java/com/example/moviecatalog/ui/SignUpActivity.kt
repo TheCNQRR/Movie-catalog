@@ -63,7 +63,7 @@ class SignUpActivity : AppCompatActivity() {
         binding.birthDate.setOnClickListener {
             val datePicker =
                 MaterialDatePicker.Builder.datePicker()
-                    .setTitleText("Select date")
+                    .setTitleText(getString(R.string.select_date))
                     .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                     .setTheme(R.style.ThemeOverlay_MovieCatalog_DatePicker)
                     .build()
@@ -106,6 +106,7 @@ class SignUpActivity : AppCompatActivity() {
 
             val authLogic = AuthLogic(
                 authApi = RetrofitClient.getAuthApi(),
+                context = this,
                 onError = { message ->
                     binding.errorMessage.text = message
                     binding.errorMessage.visibility = View.VISIBLE

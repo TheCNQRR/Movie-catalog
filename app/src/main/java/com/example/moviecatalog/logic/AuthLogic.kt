@@ -1,5 +1,7 @@
 package com.example.moviecatalog.logic
 
+import android.content.Context
+import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.AuthApi
 import com.example.moviecatalog.data.model.Token
 import com.example.moviecatalog.data.model.TokenStorage
@@ -14,7 +16,8 @@ import retrofit2.Response
 
 class AuthLogic(
     private val authApi: AuthApi,
-    private val authValidator: Validator = Validator(),
+    private val context: Context,
+    private val authValidator: Validator = Validator(context),
     private val onClearErrors: () -> Unit = {},
     private val onSuccess: () -> Unit = {},
     private val onError: (String) -> Unit = {}
@@ -48,9 +51,9 @@ class AuthLogic(
             else {
                 withContext(Dispatchers.Main) {
                     when (response.code()) {
-                        400 -> onError("Проверьте правильность заполнения полей или попробуйте другой логин")
-                        500 -> onError("Ошибка сервера")
-                        else -> onError("Ошибка ${response.code()}")
+                        400 -> onError(context.getString(R.string.check_fields_are_correct))
+                        500 -> onError(context.getString(R.string.server_error))
+                        else -> onError(context.getString(R.string.error) + "${response.code()}")
                     }
                 }
             }
@@ -81,9 +84,9 @@ class AuthLogic(
             else {
                 withContext(Dispatchers.Main) {
                     when (response.code()) {
-                        400 -> onError("Неверные логин или пароль")
-                        500 -> onError("Ошибка сервера")
-                        else -> onError("Ошибка ${response.code()}")
+                        400 -> onError(context.getString(R.string.wrong_login_or_password))
+                        500 -> onError(context.getString(R.string.server_error))
+                        else -> onError(context.getString(R.string.error) + "${response.code()}")
                     }
                 }
             }
