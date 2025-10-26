@@ -4,9 +4,9 @@ import android.content.Context
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.AuthApi
 import com.example.moviecatalog.data.model.Token
-import com.example.moviecatalog.data.model.TokenStorage
 import com.example.moviecatalog.data.model.auth.LoginCredentials
 import com.example.moviecatalog.data.model.auth.UserRegisterModel
+import com.example.moviecatalog.logic.util.TokenManager
 import com.example.moviecatalog.logic.util.Validator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +16,7 @@ import retrofit2.Response
 
 class AuthLogic(
     private val authApi: AuthApi,
+    private val tokenManager: TokenManager,
     private val context: Context,
     private val authValidator: Validator = Validator(context),
     private val onClearErrors: () -> Unit = {},
@@ -42,7 +43,7 @@ class AuthLogic(
             if (response.isSuccessful) {
                 val tokenResponse = response.body()
                 val token = tokenResponse?.accessToken ?: ""
-                TokenStorage.saveToken(token)
+                tokenManager.saveToken(context, token)
 
                 withContext(Dispatchers.Main) {
                     onSuccess()
@@ -75,7 +76,7 @@ class AuthLogic(
             if (response.isSuccessful) {
                 val tokenResponse = response.body()
                 val token = tokenResponse?.accessToken ?: ""
-                TokenStorage.saveToken(token)
+                tokenManager.saveToken(context, token)
 
                 withContext(Dispatchers.Main) {
                     onSuccess()

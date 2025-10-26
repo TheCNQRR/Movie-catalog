@@ -7,4 +7,5 @@ import kotlinx.serialization.Serializable
 data class Token(
     @SerialName("token")
     var accessToken: String,
+    val expiresIn: Long? = null
 )
