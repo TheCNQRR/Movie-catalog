@@ -44,6 +44,7 @@
         android:fontFamily="@font/ibm_plex_sans_regular"
         android:hint="@string/login_hint"
         android:inputType="textVisiblePassword"
+        android:textSize="14sp"
         android:paddingStart="16dp"
         android:paddingTop="13dp"
         android:paddingEnd="16dp"
@@ -65,6 +66,7 @@
         android:textColor="@color/accent"
         android:textColorHint="@color/gray"
         android:fontFamily="@font/ibm_plex_sans_regular"
+        android:textSize="14sp"
         android:layout_marginTop="14dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
@@ -118,7 +120,7 @@
     <TextView
         android:id="@+id/register_in_the_app"
         android:layout_width="0dp"
-        android:layout_height="44dp"
+        android:layout_height="32dp"
         android:background="@drawable/authorization_button"
         android:text="@string/register_in_the_app"
         android:textColor="@color/accent"
@@ -128,13 +130,10 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
-        android:padding="12dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
-
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
