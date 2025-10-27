@@ -44,4 +44,6 @@ object RetrofitClient {
     private val retrofit: Retrofit = getRetrofit()
 
     fun getAuthApi(): AuthApi = retrofit.create(AuthApi::class.java)
+
+    fun getMovieApi(): MovieApi = retrofit.create(MovieApi::class.java)
 }

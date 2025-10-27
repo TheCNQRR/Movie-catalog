@@ -28,17 +28,12 @@ class TokenManager {
         val expirationTime = if (expiresIn != null) {
             System.currentTimeMillis() + (expiresIn * 1000)
         } else {
-            null
+            System.currentTimeMillis() + (3600 * 1000)
         }
 
         preferences.edit {
             putString(context.getString(R.string.access_token), token)
-            if (expirationTime != null) {
-                putLong(context.getString(R.string.key_expiration_time), expirationTime)
-            }
-            else {
-                remove(context.getString(R.string.key_expiration_time))
-            }
+            putLong(context.getString(R.string.key_expiration_time), expirationTime)
         }
     }
 

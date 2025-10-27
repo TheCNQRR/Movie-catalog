@@ -33,4 +33,6 @@
     <string name="access_token">access token</string>
     <string name="token_storage">token storage</string>
     <string name="key_expiration_time">expiration_time</string>
+    <string name="watch">Смотреть</string>
+    <string name="favourite">Избранное</string>
 </resources>
