@@ -32,7 +32,7 @@ class MoviesLogic(
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    onError(context.getString(R.string.error) + "${e.message}")
+                    onError(context.getString(R.string.error) + " ${e.message}")
                 }
             }
         }
