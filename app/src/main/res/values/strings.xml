@@ -35,4 +35,8 @@
     <string name="key_expiration_time">expiration_time</string>
     <string name="watch">Смотреть</string>
     <string name="favourite">Избранное</string>
+    <string name="gallery">Галерея</string>
+    <string name="main">Главное</string>
+    <string name="collections">Коллекции</string>
+    <string name="profile">Профиль</string>
 </resources>

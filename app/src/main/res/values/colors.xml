@@ -9,5 +9,6 @@
     <color name="error">#BD0000</color>
     <color name="date_picker_background">#1C1C1E</color>
     <color name="date_picker_select_date">#5A5A5F</color>
-    <color name="green">#42cf1f</color>
+    <color name="green">#42CF1F</color>
+    <color name="bottom_panel">#1C1A19</color>
 </resources>
