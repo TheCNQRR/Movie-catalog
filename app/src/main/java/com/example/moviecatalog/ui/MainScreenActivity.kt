@@ -2,25 +2,36 @@ package com.example.moviecatalog.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.moviecatalog.R
+import com.example.moviecatalog.data.api.MovieApi
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.data.model.movie.MovieElementModel
 import com.example.moviecatalog.databinding.MainScreenBinding
 import com.example.moviecatalog.logic.MoviesLogic
+import com.example.moviecatalog.logic.util.Functions
 import com.squareup.picasso.Picasso
+import java.util.Locale
 
 class MainScreenActivity: AppCompatActivity() {
     private lateinit var binding: MainScreenBinding
     private val effects = Effects()
+
+    private var currentPage = 1
+    private var currentMovies = emptyList<MovieElementModel>()
+    private var isLoading = false
+    private var hasMorePages = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -33,39 +44,102 @@ class MainScreenActivity: AppCompatActivity() {
 
         effects.hideSystemBars(window)
 
-        loadMovies()
+        loadFirstPage()
+        setupGalleryScrollListener()
     }
 
-    private fun loadMovies() {
+    private fun loadFirstPage() {
+        if (isLoading) {
+            return
+        }
+        isLoading = true
+
         val movieLogic = MoviesLogic(
             context = this,
             movieApi = RetrofitClient.getMovieApi(),
-            onMoviesLoaded = { movies ->  showPoster(movies) },
+            onMoviesLoaded = { movies ->
+                currentMovies = movies
+                isLoading = false
+                hasMorePages = true
+
+                setUpUI()
+            },
             onError = { errorMessage ->
+                isLoading = false
                 Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-            println(errorMessage)}
+                println(errorMessage)}
         )
 
         movieLogic.getMovies(1)
     }
 
-    private fun showPoster(movies: List<MovieElementModel>) {
-        if (movies.isNotEmpty()) {
-            val firstMovie = movies[0]
-
-            Picasso.get()
-                .load(firstMovie.poster)
-                .fit()
-                .into(binding.moviePoster)
-
-            setupHorizontalList(movies)
+    private fun loadNextPage() {
+        if (isLoading || !hasMorePages) {
+            return
         }
+        isLoading = true
+        val moviesLogic = MoviesLogic(
+            context = this,
+            movieApi = RetrofitClient.getMovieApi(),
+            onMoviesLoaded = { movies ->
+                if (movies.isNotEmpty()) {
+                    currentMovies = currentMovies + movies
+                    currentPage++
+                    addMoviesToGallery(movies)
+                }
+                else {
+                    hasMorePages = false
+                }
+                isLoading = false
+            },
+            onError = { errorMessage ->
+                isLoading = false
+                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+                println(errorMessage)}
+        )
+
+        moviesLogic.getMovies(currentPage + 1)
     }
 
-    private fun setupHorizontalList(movies: List<MovieElementModel>) {
+    private fun showPoster(promotedMovie: MovieElementModel) {
+            Picasso.get()
+                .load(promotedMovie.poster)
+                .fit()
+                .into(binding.moviePoster)
+    }
+
+    private fun setUpUI() {
+        if (currentMovies.isNotEmpty()) {
+            val firstMovie = currentMovies.first()
+            showPoster(firstMovie)
+            currentMovies = currentMovies.filterIndexed { index, _ -> index != 0 }
+            addMoviesToGallery(currentMovies)
+        }
+        setupFavoriteMovies(emptyList()) //TODO передавать избранное пользователя
+    }
+
+    private fun setupFavoriteMovies(favoriteMovies: List<MovieElementModel>) {
+        if (favoriteMovies.isEmpty()) {
+            binding.favoritesTextInMain.visibility = View.GONE
+            binding.horizontalScrollForMovies.visibility = View.GONE
+
+            val parameters = binding.gallery.layoutParams as ConstraintLayout.LayoutParams
+            parameters.topToBottom = binding.moviePoster.id
+            binding.gallery.layoutParams = parameters
+
+            return
+        }
+
         val container = binding.moviesContainer
 
-        movies.forEach { movie ->
+        binding.favoritesTextInMain.visibility = View.VISIBLE
+        binding.horizontalScrollForMovies.visibility = View.VISIBLE
+
+        val parameters = binding.gallery.layoutParams as ConstraintLayout.LayoutParams
+        parameters.topToBottom = binding.horizontalScrollForMovies.id
+        binding.gallery.layoutParams = parameters
+
+        favoriteMovies.forEach { movie ->
             val movieView = LayoutInflater.from(this).inflate(
                 R.layout.movie_item_in_favorites,
                 container,
@@ -117,8 +191,68 @@ class MainScreenActivity: AppCompatActivity() {
             cardView.animate()
                 .scaleX(scale)
                 .scaleY(scale)
-                .setDuration(50)
+                .setDuration(150)
                 .start()
+        }
+    }
+
+    private fun addMoviesToGallery(movies: List<MovieElementModel>) {
+        val container = binding.galleryContainer
+
+        movies.forEach { movie ->
+            val movieView = LayoutInflater.from(this).inflate(
+                R.layout.movie_item_in_gallery,
+                container,
+                false
+            )
+
+            val poster = movieView.findViewById<ImageView>(R.id.movie_poster)
+            val name = movieView.findViewById<TextView>(R.id.movie_name_main_screen)
+            val yearCountry = movieView.findViewById<TextView>(R.id.movie_year_country_main_screen)
+            val genres = movieView.findViewById<TextView>(R.id.movie_genres_main_screen)
+            val rating = movieView.findViewById<TextView>(R.id.movie_rating_main_screen)
+
+            val movieRating = Functions().calculateMovieRating(movie)
+
+            val ratingBackground = when {
+                movieRating > 9 && movieRating <= 10 -> R.drawable.rating_masterprice
+                movieRating > 8 && movieRating <= 9 -> R.drawable.rating_excellent
+                movieRating > 7 && movieRating <= 8 -> R.drawable.rating_very_good
+                movieRating > 6 && movieRating <= 7-> R.drawable.rating_good
+                movieRating > 5 && movieRating <= 6 -> R.drawable.rating_decent
+                movieRating > 4 && movieRating <= 5 -> R.drawable.rating_average
+                movieRating > 3 &&  movieRating <= 4 -> R.drawable.rating_below_average
+                movieRating > 2 && movieRating <= 3 -> R.drawable.rating_poor
+                movieRating > 1 && movieRating <= 2 -> R.drawable.rating_very_poor
+                movieRating in 0.0..1.0 -> R.drawable.rating_awful
+                else -> R.drawable.rating_gray
+            }
+
+            name.isSelected = true
+            yearCountry.isSelected = true
+            genres.isSelected = true
+
+            Picasso.get().load(movie.poster).into(poster)
+            name.text = movie.name
+            yearCountry.text = getString(R.string.year_country_format, movie.year, movie.country)
+            genres.text = movie.genres.joinToString { it.name }
+            rating.text = String.format(Locale.getDefault(), "%.1f", movieRating)
+            rating.setBackgroundResource(ratingBackground)
+
+            container.addView(movieView)
+        }
+    }
+
+    private fun setupGalleryScrollListener() {
+        binding.scrollViewMain.viewTreeObserver.addOnScrollChangedListener {
+            val scrollView = binding.scrollViewMain
+
+            val galleryContainer = binding.galleryContainer
+            val galleryBottom = galleryContainer.bottom
+
+            if (galleryBottom <= scrollView.height + scrollView.scrollY + 500) {
+                loadNextPage()
+            }
         }
     }
 }
