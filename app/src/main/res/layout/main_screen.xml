@@ -9,7 +9,6 @@
         android:id="@+id/movie_poster"
         android:layout_width="0dp"
         android:layout_height="320dp"
-        android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -50,5 +49,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <HorizontalScrollView
+        android:id="@+id/horizontal_scroll_for_movies"
+        android:layout_width="0dp"
+        android:layout_height="172dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registration_text">
+        
+        <LinearLayout
+            android:id="@+id/movies_container"
+            android:layout_width="0dp"
+            android:layout_height="144dp"
+            android:orientation="horizontal" />
+
+        </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
