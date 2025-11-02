@@ -17,6 +17,7 @@ import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.databinding.SignInScreenBinding
 import com.example.moviecatalog.logic.AuthLogic
+import com.example.moviecatalog.logic.util.TokenManager
 import com.example.moviecatalog.logic.util.Validator
 
 class SignInActivity: AppCompatActivity() {
@@ -67,7 +68,7 @@ class SignInActivity: AppCompatActivity() {
 
             val authLogic = AuthLogic(
                 authApi = RetrofitClient.getAuthApi(),
-                tokenManager = MovieCatalogApplication.tokenManager,
+                tokenManager = getTokenManager(),
                 context = this,
                 onError = { message ->
                     binding.errorMessage.text = message
@@ -111,5 +112,9 @@ class SignInActivity: AppCompatActivity() {
 
         binding.signInLoginInput.addTextChangedListener(textWatcher)
         binding.signInLoginPassword.addTextChangedListener(textWatcher)
+    }
+
+    private fun getTokenManager(): TokenManager {
+        return (application as MovieCatalogApplication).tokenManager
     }
 }

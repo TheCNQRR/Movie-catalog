@@ -18,6 +18,7 @@ import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.databinding.SignUpScreenBinding
 import com.example.moviecatalog.logic.AuthLogic
+import com.example.moviecatalog.logic.util.TokenManager
 import com.example.moviecatalog.logic.util.Validator
 import com.google.android.material.datepicker.MaterialDatePicker
 
@@ -106,7 +107,7 @@ class SignUpActivity : AppCompatActivity() {
 
             val authLogic = AuthLogic(
                 authApi = RetrofitClient.getAuthApi(),
-                tokenManager = MovieCatalogApplication.tokenManager,
+                tokenManager = getTokenManager(),
                 context = this,
                 onError = { message ->
                     binding.errorMessage.text = message
@@ -160,5 +161,9 @@ class SignUpActivity : AppCompatActivity() {
         binding.confirmPassword.addTextChangedListener(textWatcher)
         binding.birthDate.addTextChangedListener(textWatcher)
         binding.genderSelector.setOnCheckedChangeListener { _, _ -> checkFieldsAndUpdateButton() }
+    }
+
+    private fun getTokenManager(): TokenManager {
+        return (application as MovieCatalogApplication).tokenManager
     }
 }

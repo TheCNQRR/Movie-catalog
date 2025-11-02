@@ -29,6 +29,7 @@ class MainScreenActivity: AppCompatActivity() {
     private var currentMovies = emptyList<MovieElementModel>()
     private var isLoading = false
     private var hasMorePages = false
+    private var isFirstLoad = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -51,33 +52,28 @@ class MainScreenActivity: AppCompatActivity() {
             context = this,
             movieApi = RetrofitClient.getMovieApi(),
             onMoviesLoaded = { movies ->
-                handleMoviesLoaded(movies)
+                if (isFirstLoad) {
+                    currentMovies = movies
+                    isLoading = false
+                    hasMorePages = true
+                    isFirstLoad = false
+                    setUpUI()
+                }
+                else {
+                    if (movies.isNotEmpty()) {
+                        currentMovies = currentMovies + movies
+                        currentPage++
+                        addMoviesToGallery(movies)
+                    } else {
+                        hasMorePages = false
+                    }
+                    isLoading = false
+                }
             },
             onError = { errorMessage ->
                 handleError(errorMessage)
             }
         )
-    }
-
-    private fun handleMoviesLoaded(movies: List<MovieElementModel>) {
-        if (currentPage == 1) {
-            currentMovies = movies
-            isLoading = false
-            hasMorePages = true
-
-            setUpUI()
-        }
-        else {
-            if (movies.isNotEmpty()) {
-                currentMovies = currentMovies + movies
-                currentPage++
-                addMoviesToGallery(movies)
-            }
-            else {
-                hasMorePages = false
-            }
-            isLoading = false
-        }
     }
 
     private fun handleError(errorMessage: String?) {
