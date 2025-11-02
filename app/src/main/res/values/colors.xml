@@ -9,5 +9,16 @@
     <color name="error">#BD0000</color>
     <color name="date_picker_background">#1C1C1E</color>
     <color name="date_picker_select_date">#5A5A5F</color>
-    <color name="green">#42cf1f</color>
+    <color name="green">#42CF1F</color>
+    <color name="bottom_panel">#1C1A19</color>
+    <color name="masterprice">#006633</color>
+    <color name="excellent">#02AA1F</color>
+    <color name="very_good">#56D242</color>
+    <color name="good">#A7AA02</color>
+    <color name="decent">#c7b40c</color>
+    <color name="average">#FF7A00</color>
+    <color name="below_average">#b34505</color>
+    <color name="poor">#d40000</color>
+    <color name="very_poor">#961f0f</color>
+    <color name="awful">#962b0b</color>
 </resources>

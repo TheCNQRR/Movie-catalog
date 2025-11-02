@@ -9,6 +9,6 @@ data class MovieElementModel(
     val poster: String,
     val year: Int,
     val country: String,
-    val genreModels: List<GenreModel>,
+    val genres: List<GenreModel>,
     val reviews: List<ReviewShortModel>
 )

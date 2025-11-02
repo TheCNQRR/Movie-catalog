@@ -1,26 +1,26 @@
 package com.example.moviecatalog.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import com.example.moviecatalog.MovieCatalogApplication
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.databinding.SignInScreenBinding
 import com.example.moviecatalog.logic.AuthLogic
+import com.example.moviecatalog.logic.util.TokenManager
 import com.example.moviecatalog.logic.util.Validator
+import kotlinx.coroutines.launch
 
 class SignInActivity: AppCompatActivity() {
     private lateinit var binding: SignInScreenBinding
@@ -38,7 +38,7 @@ class SignInActivity: AppCompatActivity() {
         binding = SignInScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        hideSystemBars()
+        effects.hideSystemBars(window)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -48,7 +48,7 @@ class SignInActivity: AppCompatActivity() {
 
         binding.root.setOnTouchListener { _, event ->
             if (event.action == android.view.MotionEvent.ACTION_DOWN) {
-                hideKeyboardAndClearFocus()
+                effects.hideKeyboardAndClearFocus(this, currentFocus)
             }
             false
         }
@@ -70,16 +70,23 @@ class SignInActivity: AppCompatActivity() {
 
             val authLogic = AuthLogic(
                 authApi = RetrofitClient.getAuthApi(),
+                tokenManager = getTokenManager(),
                 context = this,
                 onError = { message ->
                     binding.errorMessage.text = message
                     binding.errorMessage.visibility = View.VISIBLE
                 },
                 onClearErrors = { binding.errorMessage.visibility = View.GONE },
-                onSuccess = { println(getString(R.string.success_login)) }
+                onSuccess = {
+                    val intent = Intent(this, MainScreenActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
             )
 
-            authLogic.login(login, password)
+            lifecycleScope.launch {
+                authLogic.login(login, password)
+            }
         }
     }
 
@@ -111,24 +118,7 @@ class SignInActivity: AppCompatActivity() {
         binding.signInLoginPassword.addTextChangedListener(textWatcher)
     }
 
-    private fun hideSystemBars() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-    }
-
-    private fun hideKeyboardAndClearFocus() {
-        val currentFocus = currentFocus
-        if (currentFocus is EditText) {
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
-
-            currentFocus.clearFocus()
-            currentFocus.isFocusable = false
-            currentFocus.isFocusableInTouchMode = false
-
-            currentFocus.post {
-                currentFocus.isFocusable = true
-                currentFocus.isFocusableInTouchMode = true
-            }
-        }
+    private fun getTokenManager(): TokenManager {
+        return (application as MovieCatalogApplication).tokenManager
     }
 }

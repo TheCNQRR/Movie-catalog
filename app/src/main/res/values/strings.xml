@@ -30,4 +30,14 @@
     <string name="check_fields_are_correct">Проверьте правильность заполнения полей или попробуйте другой логин</string>
     <string name="server_error">Ошибка сервера</string>
     <string name="empty_answer_from_server">Пустой ответ от сервера></string>
+    <string name="access_token">access token</string>
+    <string name="token_storage">token storage</string>
+    <string name="key_expiration_time">expiration_time</string>
+    <string name="watch">Смотреть</string>
+    <string name="favourite">Избранное</string>
+    <string name="gallery">Галерея</string>
+    <string name="main">Главное</string>
+    <string name="collections">Коллекции</string>
+    <string name="profile">Профиль</string>
+    <string name="year_country_format">%1$d • %2$s</string>
 </resources>
