@@ -11,11 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.moviecatalog.R
-import com.example.moviecatalog.data.api.MovieApi
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.data.model.movie.MovieElementModel
 import com.example.moviecatalog.databinding.MainScreenBinding
@@ -27,6 +23,7 @@ import java.util.Locale
 class MainScreenActivity: AppCompatActivity() {
     private lateinit var binding: MainScreenBinding
     private val effects = Effects()
+    private lateinit var moviesLogic: MoviesLogic
 
     private var currentPage = 1
     private var currentMovies = emptyList<MovieElementModel>()
@@ -44,8 +41,49 @@ class MainScreenActivity: AppCompatActivity() {
 
         effects.hideSystemBars(window)
 
+        initializeMovieLogic()
         loadFirstPage()
         setupGalleryScrollListener()
+    }
+
+    private fun initializeMovieLogic() {
+        moviesLogic = MoviesLogic(
+            context = this,
+            movieApi = RetrofitClient.getMovieApi(),
+            onMoviesLoaded = { movies ->
+                handleMoviesLoaded(movies)
+            },
+            onError = { errorMessage ->
+                handleError(errorMessage)
+            }
+        )
+    }
+
+    private fun handleMoviesLoaded(movies: List<MovieElementModel>) {
+        if (currentPage == 1) {
+            currentMovies = movies
+            isLoading = false
+            hasMorePages = true
+
+            setUpUI()
+        }
+        else {
+            if (movies.isNotEmpty()) {
+                currentMovies = currentMovies + movies
+                currentPage++
+                addMoviesToGallery(movies)
+            }
+            else {
+                hasMorePages = false
+            }
+            isLoading = false
+        }
+    }
+
+    private fun handleError(errorMessage: String?) {
+        isLoading = false
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        println(errorMessage)
     }
 
     private fun loadFirstPage() {
@@ -54,23 +92,7 @@ class MainScreenActivity: AppCompatActivity() {
         }
         isLoading = true
 
-        val movieLogic = MoviesLogic(
-            context = this,
-            movieApi = RetrofitClient.getMovieApi(),
-            onMoviesLoaded = { movies ->
-                currentMovies = movies
-                isLoading = false
-                hasMorePages = true
-
-                setUpUI()
-            },
-            onError = { errorMessage ->
-                isLoading = false
-                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-                println(errorMessage)}
-        )
-
-        movieLogic.getMovies(1)
+        moviesLogic.getMovies(1)
     }
 
     private fun loadNextPage() {
@@ -78,25 +100,6 @@ class MainScreenActivity: AppCompatActivity() {
             return
         }
         isLoading = true
-        val moviesLogic = MoviesLogic(
-            context = this,
-            movieApi = RetrofitClient.getMovieApi(),
-            onMoviesLoaded = { movies ->
-                if (movies.isNotEmpty()) {
-                    currentMovies = currentMovies + movies
-                    currentPage++
-                    addMoviesToGallery(movies)
-                }
-                else {
-                    hasMorePages = false
-                }
-                isLoading = false
-            },
-            onError = { errorMessage ->
-                isLoading = false
-                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-                println(errorMessage)}
-        )
 
         moviesLogic.getMovies(currentPage + 1)
     }
