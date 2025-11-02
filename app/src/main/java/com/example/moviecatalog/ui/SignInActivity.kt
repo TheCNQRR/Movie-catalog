@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.moviecatalog.MovieCatalogApplication
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
@@ -19,6 +20,7 @@ import com.example.moviecatalog.databinding.SignInScreenBinding
 import com.example.moviecatalog.logic.AuthLogic
 import com.example.moviecatalog.logic.util.TokenManager
 import com.example.moviecatalog.logic.util.Validator
+import kotlinx.coroutines.launch
 
 class SignInActivity: AppCompatActivity() {
     private lateinit var binding: SignInScreenBinding
@@ -82,7 +84,9 @@ class SignInActivity: AppCompatActivity() {
                 }
             )
 
-            authLogic.login(login, password)
+            lifecycleScope.launch {
+                authLogic.login(login, password)
+            }
         }
     }
 

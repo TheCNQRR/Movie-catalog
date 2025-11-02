@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.data.model.movie.MovieElementModel
@@ -18,6 +19,7 @@ import com.example.moviecatalog.databinding.MainScreenBinding
 import com.example.moviecatalog.logic.MoviesLogic
 import com.example.moviecatalog.logic.util.Functions
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class MainScreenActivity: AppCompatActivity() {
@@ -88,7 +90,9 @@ class MainScreenActivity: AppCompatActivity() {
         }
         isLoading = true
 
-        moviesLogic.getMovies(1)
+        lifecycleScope.launch {
+            moviesLogic.getMovies(1)
+        }
     }
 
     private fun loadNextPage() {
@@ -97,7 +101,9 @@ class MainScreenActivity: AppCompatActivity() {
         }
         isLoading = true
 
-        moviesLogic.getMovies(currentPage + 1)
+        lifecycleScope.launch {
+            moviesLogic.getMovies(currentPage + 1)
+        }
     }
 
     private fun showPoster(promotedMovie: MovieElementModel) {
