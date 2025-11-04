@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.data.model.movie.MovieElementModel
@@ -26,6 +28,9 @@ class MainScreenActivity: AppCompatActivity() {
     private lateinit var binding: MainScreenBinding
     private val effects = Effects()
     private lateinit var moviesLogic: MoviesLogic
+    private val galleryAdapter = GalleryAdapter { movie ->
+        Toast.makeText(this, "Clicked: ${movie.name}", Toast.LENGTH_SHORT).show()
+    }
 
     private var currentPage = 1
     private var currentMovies = emptyList<MovieElementModel>()
@@ -44,6 +49,7 @@ class MainScreenActivity: AppCompatActivity() {
 
         effects.hideSystemBars(window)
 
+        setupRecyclerView()
         initializeMovieLogic()
         loadFirstPage()
         setupGalleryScrollListener()
@@ -201,51 +207,15 @@ class MainScreenActivity: AppCompatActivity() {
         }
     }
 
-    private fun addMoviesToGallery(movies: List<MovieElementModel>) {
-        val container = binding.galleryContainer
-
-        movies.forEach { movie ->
-            val movieView = LayoutInflater.from(this).inflate(
-                R.layout.movie_item_in_gallery,
-                container,
-                false
-            )
-
-            val poster = movieView.findViewById<ImageView>(R.id.movie_poster)
-            val name = movieView.findViewById<TextView>(R.id.movie_name_main_screen)
-            val yearCountry = movieView.findViewById<TextView>(R.id.movie_year_country_main_screen)
-            val genres = movieView.findViewById<TextView>(R.id.movie_genres_main_screen)
-            val rating = movieView.findViewById<TextView>(R.id.movie_rating_main_screen)
-
-            val movieRating = Functions().calculateMovieRating(movie)
-
-            val ratingBackground = when {
-                movieRating > 9 && movieRating <= 10 -> R.drawable.rating_masterprice
-                movieRating > 8 && movieRating <= 9 -> R.drawable.rating_excellent
-                movieRating > 7 && movieRating <= 8 -> R.drawable.rating_very_good
-                movieRating > 6 && movieRating <= 7-> R.drawable.rating_good
-                movieRating > 5 && movieRating <= 6 -> R.drawable.rating_decent
-                movieRating > 4 && movieRating <= 5 -> R.drawable.rating_average
-                movieRating > 3 &&  movieRating <= 4 -> R.drawable.rating_below_average
-                movieRating > 2 && movieRating <= 3 -> R.drawable.rating_poor
-                movieRating > 1 && movieRating <= 2 -> R.drawable.rating_very_poor
-                movieRating in 0.0..1.0 -> R.drawable.rating_awful
-                else -> R.drawable.rating_gray
-            }
-
-            name.isSelected = true
-            yearCountry.isSelected = true
-            genres.isSelected = true
-
-            Picasso.get().load(movie.poster).into(poster)
-            name.text = movie.name
-            yearCountry.text = getString(R.string.year_country_format, movie.year, movie.country)
-            genres.text = movie.genres.joinToString { it.name }
-            rating.text = String.format(Locale.getDefault(), "%.1f", movieRating)
-            rating.setBackgroundResource(ratingBackground)
-
-            container.addView(movieView)
+    private fun setupRecyclerView() {
+        binding.galleryContainer.apply {
+            layoutManager = LinearLayoutManager(this@MainScreenActivity)
+            adapter = galleryAdapter
         }
+    }
+
+    private fun addMoviesToGallery(movies: List<MovieElementModel>) {
+        galleryAdapter.addMovies(movies)
     }
 
     private fun setupGalleryScrollListener() {
