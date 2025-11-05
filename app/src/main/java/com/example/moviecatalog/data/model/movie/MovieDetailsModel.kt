@@ -1,8 +1,11 @@
 package com.example.moviecatalog.data.model.movie
 
+import android.os.Parcelable
 import com.example.moviecatalog.data.model.review.ReviewModel
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
+@Parcelize
 @Serializable
 data class MovieDetailsModel(
     val id: String,
@@ -19,4 +22,4 @@ data class MovieDetailsModel(
     val budget: Int,
     val fees: Int,
     val ageLimit: Int
-)
+): Parcelable

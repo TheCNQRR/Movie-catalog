@@ -1,12 +1,11 @@
 package com.example.moviecatalog.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -19,17 +18,36 @@ import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.data.model.movie.MovieElementModel
 import com.example.moviecatalog.databinding.MainScreenBinding
 import com.example.moviecatalog.logic.MoviesLogic
-import com.example.moviecatalog.logic.util.Functions
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 class MainScreenActivity: AppCompatActivity() {
     private lateinit var binding: MainScreenBinding
     private val effects = Effects()
     private lateinit var moviesLogic: MoviesLogic
+
     private val galleryAdapter = GalleryAdapter { movie ->
-        Toast.makeText(this, "Clicked: ${movie.name}", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            val moviesLogic = MoviesLogic(
+                context = this@MainScreenActivity,
+                movieApi = RetrofitClient.getMovieApi(),
+                onMoviesLoaded = {},
+                onMovieDetailsLoaded = { details ->
+                    runOnUiThread {
+                        val intent = Intent(this@MainScreenActivity, MovieScreenActivity::class.java).apply {
+                            putExtra("movie_details", details)
+                        }
+                        startActivity(intent)
+                    }
+                },
+                onError = { error ->
+                    runOnUiThread {
+                        Toast.makeText(this@MainScreenActivity, "Не удалось загрузить детали фильма", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
+            moviesLogic.getMovieDetails(movie.id)
+        }
     }
 
     private var currentPage = 1
