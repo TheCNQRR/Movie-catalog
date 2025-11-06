@@ -9,7 +9,7 @@ import com.example.moviecatalog.data.model.movie.MovieElementModel
 class MoviesLogic(
     private val context: Context,
     private val movieApi: MovieApi,
-    private val onMoviesLoaded: (List<MovieElementModel>) -> Unit,
+    private val onMoviesLoaded: (List<MovieElementModel>) -> Unit = {},
     private val onMovieDetailsLoaded: (MovieDetailsModel?) -> Unit = {},
     private val onError: (String?) -> Unit = {}) {
     suspend fun getMovies(page: Int) {

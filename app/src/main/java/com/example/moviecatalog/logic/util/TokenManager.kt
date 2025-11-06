@@ -24,42 +24,21 @@ class TokenManager {
 
     fun saveToken(context: Context, token: String, expiresIn: Long? = null) {
         val preferences = getPreferences(context)
-
-        val expirationTime = if (expiresIn != null) {
-            System.currentTimeMillis() + (expiresIn * 1000)
-        } else {
-            System.currentTimeMillis() + (3600 * 1000)
-        }
-
         preferences.edit {
             putString(context.getString(R.string.access_token), token)
-            putLong(context.getString(R.string.key_expiration_time), expirationTime)
         }
     }
 
-    private fun getToken(context: Context): String? {
+    fun getToken(context: Context): String? {
         val preferences = getPreferences(context)
         val token = preferences.getString(context.getString(R.string.access_token), null) ?: return null
-
         return token
-    }
-
-    private fun isTokenExpired(context: Context): Boolean {
-        val preferences = getPreferences(context)
-        val expirationTime = preferences.getLong(context.getString(R.string.key_expiration_time), -1L)
-
-        if (expirationTime == -1L) {
-            return false
-        }
-
-        return System.currentTimeMillis() > expirationTime
     }
 
     fun clearToken(context: Context) {
         val preferences = getPreferences(context)
         preferences.edit {
             remove(context.getString(R.string.access_token))
-            remove(context.getString(R.string.key_expiration_time))
         }
     }
 

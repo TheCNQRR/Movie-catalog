@@ -51,4 +51,6 @@
     <string name="fees">Сборы в мире</string>
     <string name="age">Возраст</string>
     <string name="genres">Жанры</string>
+    <string name="reviews">Отзывы</string>
+    <string name="add_review">Добавить отзыв</string>
 </resources>

@@ -46,4 +46,6 @@ object RetrofitClient {
     fun getAuthApi(): AuthApi = retrofit.create(AuthApi::class.java)
 
     fun getMovieApi(): MovieApi = retrofit.create(MovieApi::class.java)
+
+    fun getUserApi(): UserApi = retrofit.create(UserApi::class.java)
 }
