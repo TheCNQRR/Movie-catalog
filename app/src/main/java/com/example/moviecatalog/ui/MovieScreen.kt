@@ -2,25 +2,27 @@ package com.example.moviecatalog.ui
 
 import android.widget.ImageView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.model.movie.MovieDetailsModel
-import com.example.moviecatalog.data.model.movie.MovieElementModel
 import com.squareup.picasso.Picasso
 
 @Composable
@@ -75,9 +76,10 @@ fun MovieScreen(movie: MovieDetailsModel) {
                 modifier = Modifier
                     .width(343.dp)
                     .wrapContentHeight()
+                    .align(Alignment.BottomStart)
                     .padding(
                         start = 16.dp,
-                        top = 154.dp
+                        bottom = 16.dp
                     )
             )
         }
@@ -130,7 +132,6 @@ fun MovieScreen(movie: MovieDetailsModel) {
 fun PicassoImage(
     url: String,
     modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Crop
 ) {
     AndroidView(
         factory = { context ->
@@ -228,7 +229,63 @@ private fun formatNumber(number: Int): String {
 
 @Composable
 fun MovieGenres(movie: MovieDetailsModel) {
-
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = 16.dp
+            )
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            text = stringResource(R.string.genres),
+            fontSize = 16.sp,
+            color = colorResource(R.color.white)
+        )
+        FlowRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = 8.dp
+                ),
+            horizontalArrangement = Arrangement.Start,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            maxItemsInEachRow = Int.MAX_VALUE
+        ) {
+            movie.genres.forEachIndexed { _, genre ->
+                Box(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(
+                           end = 8.dp
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = colorResource(R.color.accent),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(
+                                horizontal = 16.dp,
+                                vertical = 6.dp
+                            )
+                    ) {
+                        Text(
+                            text = genre.name,
+                            fontSize = 12.sp,
+                            color = colorResource(R.color.white)
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable

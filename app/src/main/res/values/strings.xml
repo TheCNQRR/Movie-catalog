@@ -50,4 +50,5 @@
     <string name="budget">Бюджет</string>
     <string name="fees">Сборы в мире</string>
     <string name="age">Возраст</string>
+    <string name="genres">Жанры</string>
 </resources>
