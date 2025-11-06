@@ -21,4 +21,5 @@
     <color name="poor">#d40000</color>
     <color name="very_poor">#961f0f</color>
     <color name="awful">#962b0b</color>
+    <color name="about_movie">#B3B3B3</color>
 </resources>
