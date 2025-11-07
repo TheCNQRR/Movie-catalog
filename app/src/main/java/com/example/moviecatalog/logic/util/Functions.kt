@@ -20,4 +20,18 @@ class Functions {
 
         return rating
     }
+
+    fun formatNumber(number: Int): String {
+        val numberString = number.toString()
+        val result = StringBuilder()
+
+        for ((count, i) in (numberString.length - 1 downTo 0).withIndex()) {
+            if (count > 0 && count % 3 == 0) {
+                result.append(' ')
+            }
+            result.append(numberString[i])
+        }
+
+        return "$${result.reverse()}"
+    }
 }

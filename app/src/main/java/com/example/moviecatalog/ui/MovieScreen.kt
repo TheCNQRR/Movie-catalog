@@ -41,6 +41,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,6 +55,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -66,15 +69,18 @@ import com.example.moviecatalog.data.model.user.ProfileModel
 import com.squareup.picasso.Picasso
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.window.Dialog
+import com.example.moviecatalog.logic.util.Functions
 import kotlinx.coroutines.delay
 
 @Composable
-fun MovieScreen(movie: MovieDetailsModel,
-                user: ProfileModel,
-                onBackButtonClick: () -> Unit,
-                onAddReview: (String, Int, String, Boolean) -> Unit,
-                onDeleteReview: (String, String) -> Unit,
-                onEditReview: (String, String, Int, String, Boolean) -> Unit) {
+fun MovieScreen(
+    movie: MovieDetailsModel,
+    user: ProfileModel,
+    onBackButtonClick: () -> Unit,
+    onAddReview: (String, Int, String, Boolean) -> Unit,
+    onDeleteReview: (String, String) -> Unit,
+    onEditReview: (String, String, Int, String, Boolean) -> Unit
+) {
     val scrollState = rememberScrollState()
     val progress = (scrollState.value / 150f).coerceIn(0f, 1f)
     val showDialog = remember { mutableStateOf(false) }
@@ -110,40 +116,37 @@ fun MovieScreen(movie: MovieDetailsModel,
                 )
 
                 Text(
-                    text = movie.name,
-                    fontSize = (36 * (1 - progress * 0.5f)).sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White.copy(alpha = 1f - progress),
-                    maxLines = if (progress > 0.5f) 1 else 2,
-                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .align(Alignment.BottomStart)
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    text = movie.name,
+                    fontSize = (36 * (1 - progress * 0.5f)).sp,
+                    fontFamily = FontFamily(Font(R.font.ibm_plex_sans_bold)),
+                    color = Color.White.copy(alpha = 1f - progress),
+                    maxLines = if (progress > 0.5f) 1 else 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
             Text(
-                text = movie.description,
-                fontSize = 14.sp,
-                color = Color.White,
                 modifier = Modifier
                     .width(343.dp)
                     .wrapContentHeight()
                     .padding(
                         start = 16.dp,
                         top = 16.dp
-                    )
+                    ),
+                text = movie.description,
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.ibm_plex_sans_regular)),
+                color = colorResource(R.color.white)
             )
 
             val expanded = remember { mutableStateOf(false) }
 
             Button(
-                onClick = {
-                    expanded.value = true
-                },
-                shape = RoundedCornerShape(4.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -152,13 +155,16 @@ fun MovieScreen(movie: MovieDetailsModel,
                         start = 16.dp,
                         end = 16.dp
                     ),
+                shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.accent)
-                )
+                ),
+                onClick = { expanded.value = true },
             ) {
                 Text(
                     text = stringResource(R.string.add_to_collection),
                     fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.ibm_plex_sans_bold)),
                     color = colorResource(R.color.white),
                     textAlign = TextAlign.Center
                 )
@@ -218,57 +224,58 @@ fun MovieScreen(movie: MovieDetailsModel,
             Spacer(modifier = Modifier.width(20.dp))
 
             IconButton(
-                onClick = onBackButtonClick,
                 modifier = Modifier
                     .size(24.dp)
                     .background(
                         color = colorResource(R.color.toolbar_background).copy(alpha = progress),
                         shape = CircleShape
-                    )
+                    ),
+                onClick = onBackButtonClick
             ) {
                 Icon(
                     painter = painterResource(R.drawable.toolbar_back),
-                    contentDescription = "Back",
-                    tint = Color.White
+                    contentDescription = stringResource(R.string.back),
+                    tint = colorResource(R.color.white)
                 )
             }
 
             Text(
-                text = movie.name,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White.copy(alpha = progress),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .weight(1f)
                     .padding(
                         start = 9.dp,
                         end = 8.dp
                     )
-                    .alpha(progress)
+                    .alpha(progress),
+                text = movie.name,
+                fontSize = 24.sp,
+                fontFamily = FontFamily(Font(R.font.ibm_plex_sans_bold)),
+                color = Color.White.copy(alpha = progress),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             IconButton(
-                onClick = {
-                    //TODO добавление фильма в избранное
-                },
                 modifier = Modifier
                     .size(24.dp)
                     .background(
                         color = colorResource(R.color.toolbar_background).copy(alpha = progress),
                         shape = CircleShape
-                    )
+                    ),
+                onClick = {
+                    //TODO добавление фильма в избранное
+                },
             ) {
                 Icon(
                     painter = painterResource(R.drawable.toolbar_add_to_favorite),
-                    contentDescription = "Favorite",
+                    contentDescription = stringResource(R.string.favourite),
                     tint = colorResource(R.color.accent)
                 )
             }
 
             Spacer(modifier = Modifier.width(20.dp))
         }
+
         if (showDialog.value) {
             ReviewDialog(
                 movie,
@@ -317,11 +324,12 @@ fun AboutMovie(movie: MovieDetailsModel) {
             )
     ) {
         Text(
-            text = stringResource(R.string.about_movie),
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
+            text = stringResource(R.string.about_movie),
             fontSize = 16.sp,
+            fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
             color = colorResource(R.color.white)
         )
 
@@ -331,8 +339,8 @@ fun AboutMovie(movie: MovieDetailsModel) {
             Pair(stringResource(R.string.time), "${movie.time} мин."),
             Pair(stringResource(R.string.tagline), "\"${movie.tagline}\""),
             Pair(stringResource(R.string.director), movie.director),
-            Pair(stringResource(R.string.budget), formatNumber(movie.budget)),
-            Pair(stringResource(R.string.fees), formatNumber(movie.fees)),
+            Pair(stringResource(R.string.budget), Functions().formatNumber(movie.budget)),
+            Pair(stringResource(R.string.fees), Functions().formatNumber(movie.fees)),
             Pair(stringResource(R.string.age), "${movie.ageLimit}+")
         )
 
@@ -350,6 +358,7 @@ fun AboutMovie(movie: MovieDetailsModel) {
                 Text(
                     text = label,
                     fontSize = 12.sp,
+                    fontFamily = FontFamily(Font(R.font.montserrat_medium)),
                     color = colorResource(R.color.about_movie),
                     modifier = Modifier.width(maxWidth),
                     textAlign = TextAlign.Start
@@ -358,6 +367,7 @@ fun AboutMovie(movie: MovieDetailsModel) {
                 Text(
                     text = value,
                     fontSize = 12.sp,
+                    fontFamily = FontFamily(Font(R.font.montserrat_medium)),
                     color = colorResource(R.color.white),
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Start
@@ -365,22 +375,6 @@ fun AboutMovie(movie: MovieDetailsModel) {
             }
         }
     }
-}
-
-private fun formatNumber(number: Int): String {
-    val numberString = number.toString()
-    val result = StringBuilder()
-    var count = 0
-
-    for (i in numberString.length - 1 downTo 0) {
-        if (count > 0 && count % 3 == 0) {
-            result.append(' ')
-        }
-        result.append(numberString[i])
-        count++
-    }
-
-    return "$${result.reverse()}"
 }
 
 @Composable
@@ -401,6 +395,7 @@ fun MovieGenres(movie: MovieDetailsModel) {
                 .wrapContentHeight(),
             text = stringResource(R.string.genres),
             fontSize = 16.sp,
+            fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
             color = colorResource(R.color.white)
         )
         FlowRow(
@@ -417,9 +412,7 @@ fun MovieGenres(movie: MovieDetailsModel) {
                 Box(
                     modifier = Modifier
                         .wrapContentSize()
-                        .padding(
-                           end = 8.dp
-                        )
+                        .padding(end = 8.dp)
                 ) {
                     Box(
                         modifier = Modifier
@@ -435,6 +428,7 @@ fun MovieGenres(movie: MovieDetailsModel) {
                         Text(
                             text = genre.name,
                             fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(R.font.montserrat_medium)),
                             color = colorResource(R.color.white)
                         )
                     }
@@ -465,15 +459,14 @@ fun Reviews(
             )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                modifier = Modifier
-                    .wrapContentSize(),
+                modifier = Modifier.wrapContentSize(),
                 text = stringResource(R.string.reviews),
                 fontSize = 16.sp,
+                fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
                 color = colorResource(R.color.white)
             )
 
@@ -486,8 +479,7 @@ fun Reviews(
             if (!isUserHasReview.value) {
                 IconButton(
                     onClick = onShowDialog,
-                    modifier = Modifier
-                        .size(16.dp)
+                    modifier = Modifier.size(16.dp)
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.add_review),
@@ -557,26 +549,22 @@ fun Review(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
-                    .padding(
-                        end = 8.dp
-                    ),
+                    .padding(end = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    modifier = Modifier
-                        .wrapContentSize(),
+                    modifier = Modifier.wrapContentSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .padding(
-                                start = 8.dp
-                            )
+                            .padding(start = 8.dp)
                     ) {
                         val avatarUrl = review.author!!.avatar
+
                         if (!avatarUrl.isNullOrBlank() && avatarUrl != "" && !review.isAnonymous) {
                             PicassoImage(
                                 url = avatarUrl,
@@ -588,9 +576,8 @@ fun Review(
                         else {
                             Icon(
                                 painter = painterResource(R.drawable.default_user_icon),
-                                contentDescription = "Default avatar",
-                                modifier = Modifier
-                                    .size(40.dp),
+                                contentDescription = stringResource(R.string.default_avatar),
+                                modifier = Modifier.size(40.dp),
                                 tint = Color.Unspecified
                             )
                         }
@@ -599,21 +586,20 @@ fun Review(
                         modifier = Modifier
                             .wrapContentWidth()
                             .height(40.dp)
-                            .padding(
-                                start = 8.dp
-                            ),
+                            .padding(start = 8.dp),
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
                             text = if (review.isAnonymous) stringResource(R.string.anonymous_user) else review.author!!.nickName!!,
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
+                            fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
                             color = colorResource(R.color.white)
                         )
                         if (!review.isAnonymous && review.author!!.userId == user.id) {
                             Text(
                                 text = stringResource(R.string.my_review),
                                 fontSize = 12.sp,
+                                fontFamily = FontFamily(Font(R.font.ibm_plex_sans_regular)),
                                 color = colorResource(R.color.gray)
                             )
                         }
@@ -632,7 +618,7 @@ fun Review(
                     Text(
                         text = review.rating.toString(),
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
+                        fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
                         color = colorResource(R.color.white)
                     )
                 }
@@ -647,6 +633,7 @@ fun Review(
                     ),
                 text = review.reviewText,
                 fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.ibm_plex_sans_regular)),
                 color = colorResource(R.color.white)
             )
             Row(
@@ -662,6 +649,7 @@ fun Review(
                     Text(
                         text = review.createdDateTime,
                         fontSize = 12.sp,
+                        fontFamily = FontFamily(Font(R.font.ibm_plex_sans_regular)),
                         color = colorResource(R.color.gray)
                     )
                 }
@@ -687,9 +675,8 @@ fun Review(
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.edit_review),
-                                contentDescription = "Edit review",
-                                modifier = Modifier
-                                    .size(8.dp),
+                                contentDescription = stringResource(R.string.edit_review),
+                                modifier = Modifier.size(8.dp),
                                 tint = colorResource(R.color.gray_faded)
                             )
                         }
@@ -709,10 +696,9 @@ fun Review(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
+                                modifier = Modifier.size(8.dp),
                                 painter = painterResource(R.drawable.delete_review),
-                                contentDescription = "Delete review",
-                                modifier = Modifier
-                                    .size(8.dp),
+                                contentDescription = stringResource(R.string.delete_review),
                                 tint = colorResource(R.color.gray_faded)
                             )
                         }
@@ -733,13 +719,13 @@ fun ReviewDialog(
 ) {
     val reviewText = remember { mutableStateOf("") }
     val checkIcon = remember { mutableStateOf(false) }
-    val rating = remember { mutableStateOf(0) }
+    val rating = remember { mutableIntStateOf(0) }
     val showError = remember { mutableStateOf(false) }
 
     LaunchedEffect(editingReview) {
         reviewText.value = editingReview?.reviewText ?: ""
         checkIcon.value = editingReview?.isAnonymous ?: false
-        rating.value = editingReview?.rating ?: 0
+        rating.intValue = editingReview?.rating ?: 0
     }
 
     Box(
@@ -768,7 +754,7 @@ fun ReviewDialog(
             Text(
                 text = stringResource(R.string.leave_a_review),
                 fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily(Font(R.font.ibm_plex_sans_bold)),
                 color = colorResource(R.color.white)
             )
 
@@ -784,13 +770,10 @@ fun ReviewDialog(
                     val starIndex = index + 1
 
                     IconButton(
-                        modifier = Modifier
-                            .size(24.dp),
-                        onClick = {
-                            rating.value = starIndex
-                        }
+                        modifier = Modifier.size(24.dp),
+                        onClick = { rating.intValue = starIndex }
                     ) {
-                        val iconStar = if (starIndex <= rating.value) {
+                        val iconStar = if (starIndex <= rating.intValue) {
                             painterResource(R.drawable.star_filled)
                         }
                         else {
@@ -801,7 +784,7 @@ fun ReviewDialog(
                             modifier = Modifier.size(24.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (starIndex <= rating.value) {
+                            if (starIndex <= rating.intValue) {
                                 Box(
                                     modifier = Modifier
                                         .size(24.dp)
@@ -814,10 +797,10 @@ fun ReviewDialog(
                         }
 
                         Icon(
-                            painter = iconStar,
-                            contentDescription = "Star",
                             modifier = Modifier.size(18.dp),
-                            tint = if (starIndex <= rating.value) {
+                            painter = iconStar,
+                            contentDescription = stringResource(R.string.star),
+                            tint = if (starIndex <= rating.intValue) {
                                 colorResource(R.color.accent)
                             }
                             else {
@@ -840,6 +823,7 @@ fun ReviewDialog(
                     Text(
                         text = stringResource(R.string.review),
                         fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(R.font.montserrat_regular)),
                         color = colorResource(R.color.gray_faded)
                     )
                 },
@@ -854,7 +838,8 @@ fun ReviewDialog(
                     unfocusedIndicatorColor = Color.Transparent
                 ),
                 textStyle = TextStyle(
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(R.font.montserrat_regular)),
                 ),
                 singleLine = false,
                 maxLines = Int.MAX_VALUE,
@@ -873,7 +858,7 @@ fun ReviewDialog(
                 Text(
                     text = stringResource(R.string.anonymous_review),
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
+                    fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
                     color = colorResource(R.color.gray_faded)
                 )
 
@@ -890,11 +875,11 @@ fun ReviewDialog(
                 ) {
                     if (checkIcon.value) {
                         Icon(
-                            painter = painterResource(R.drawable.check_icon),
-                            contentDescription = "Check icon",
                             modifier = Modifier
                                 .width(15.dp)
                                 .height(10.dp),
+                            painter = painterResource(R.drawable.check_icon),
+                            contentDescription = stringResource(R.string.check_icon),
                             tint = colorResource(R.color.accent)
                         )
                     }
@@ -904,13 +889,20 @@ fun ReviewDialog(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp),
+                shape = RoundedCornerShape(4.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.accent)
+                ),
                 onClick = {
                     if (reviewText.value.isNotBlank()) {
                         if (editingReview != null) {
-                            onEditReview(movie.id, editingReview.id, rating.value, reviewText.value, checkIcon.value)
+                            onEditReview(movie.id, editingReview.id, rating.intValue, reviewText.value, checkIcon.value)
                         }
                         else {
-                            onAddReview(movie.id, rating.value, reviewText.value, checkIcon.value)
+                            onAddReview(movie.id, rating.intValue, reviewText.value, checkIcon.value)
                         }
                         onDismiss()
                     }
@@ -918,18 +910,11 @@ fun ReviewDialog(
                         showError.value = true
                     }
                 },
-                shape = RoundedCornerShape(4.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(44.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(R.color.accent)
-                )
             ) {
                 Text(
                     text = stringResource(R.string.save),
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
+                    fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
                     color = colorResource(R.color.white),
                     textAlign = TextAlign.Center
                 )
@@ -938,21 +923,19 @@ fun ReviewDialog(
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = {
-                    onDismiss()
-                },
-                shape = RoundedCornerShape(4.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(32.dp),
+                shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.review_background)
-                )
+                ),
+                onClick = { onDismiss() }
             ) {
                 Text(
                     text = stringResource(R.string.cancel),
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
+                    fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
                     color = colorResource(R.color.accent),
                     textAlign = TextAlign.Center
                 )
@@ -996,8 +979,8 @@ fun ErrorNotification(
                     .wrapContentSize()
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Box(
                         modifier = Modifier
@@ -1017,14 +1000,12 @@ fun ErrorNotification(
                         )
                     }
                     Text(
+                        modifier = Modifier.padding(bottom = 16.dp),
                         text = message,
-                        style = TextStyle(
-                            color = colorResource(R.color.white),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Center
-                        ),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        color = colorResource(R.color.white),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
