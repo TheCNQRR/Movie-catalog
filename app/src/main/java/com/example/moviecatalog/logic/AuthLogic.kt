@@ -42,7 +42,7 @@ class AuthLogic(
             when (response.code()) {
                 400 -> onError(context.getString(R.string.check_fields_are_correct))
                 500 -> onError(context.getString(R.string.server_error))
-                else -> onError(context.getString(R.string.error) + "${response.code()}")
+                else -> onError(context.getString(R.string.error) + response.code())
             }
         }
     }
@@ -67,7 +67,7 @@ class AuthLogic(
             when (response.code()) {
                 400 -> onError(context.getString(R.string.wrong_login_or_password))
                 500 -> onError(context.getString(R.string.server_error))
-                else -> onError(context.getString(R.string.error) + "${response.code()}")
+                else -> onError(context.getString(R.string.error) + response.code())
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.example.moviecatalog.logic
 
 import android.content.Context
+import androidx.compose.ui.res.stringResource
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.MovieApi
 import com.example.moviecatalog.data.model.movie.MovieDetailsModel
@@ -21,10 +22,10 @@ class MoviesLogic(
                 onMoviesLoaded(movies)
             }
             else {
-                onError("Ошибка загрузки: ${response.code()}")
+                onError(context.getString(R.string.error) + response.code())
             }
         } catch (e: Exception) {
-            onError(context.getString(R.string.error) + " ${e.message}")
+            onError(context.getString(R.string.error) + e.message)
         }
     }
 
@@ -37,10 +38,10 @@ class MoviesLogic(
                 onMovieDetailsLoaded(movieDetails)
             }
             else {
-                onError("Ошибка загрузки: ${response.code()}")
+                onError(context.getString(R.string.error) + response.code())
             }
         } catch (e: Exception) {
-            onError(context.getString(R.string.error) + " ${e.message}")
+            onError(context.getString(R.string.error) + e.message)
         }
     }
 }

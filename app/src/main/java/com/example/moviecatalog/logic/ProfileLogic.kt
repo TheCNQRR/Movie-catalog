@@ -15,7 +15,7 @@ class ProfileLogic(
     private val onLogout: () -> Unit = {}
 ) {
     suspend fun getUser(): ProfileModel? {
-        val response = userApi.getProfile("Bearer $token")
+        val response = userApi.getProfile(context.getString(R.string.bearer) + " " + token)
 
         return if (response.isSuccessful) {
             response.body()
@@ -33,7 +33,7 @@ class ProfileLogic(
                     null
                 }
                 else ->  {
-                    Toast.makeText(context, context.getString(R.string.error) + "${response.code()}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.error) + response.code(), Toast.LENGTH_SHORT).show()
                     null
                 }
             }

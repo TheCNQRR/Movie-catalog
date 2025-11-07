@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.moviecatalog.logic.util
 
 import android.content.Context
@@ -22,7 +24,7 @@ class TokenManager {
         )
     }
 
-    fun saveToken(context: Context, token: String, expiresIn: Long? = null) {
+    fun saveToken(context: Context, token: String) {
         val preferences = getPreferences(context)
         preferences.edit {
             putString(context.getString(R.string.access_token), token)
@@ -40,9 +42,5 @@ class TokenManager {
         preferences.edit {
             remove(context.getString(R.string.access_token))
         }
-    }
-
-    fun isLoggedIn(context: Context): Boolean {
-        return getToken(context) != null
     }
 }
