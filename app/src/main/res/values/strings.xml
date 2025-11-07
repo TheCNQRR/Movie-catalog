@@ -67,4 +67,9 @@
     <string name="delete_review">Удалить отзыв</string>
     <string name="star">star</string>
     <string name="check_icon">star</string>
+    <string name="movie_details">movie_details</string>
+    <string name="bearer">Bearer</string>
+    <string name="already_had_review">already had review</string>
+    <string name="forbidden_to_edit">Нельзя изменить видимость автора отзыва</string>
+    <string name="edit_error">Ошибка редактирования:</string>
 </resources>

@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
@@ -35,7 +34,9 @@ class MovieScreenActivity: ComponentActivity() {
 
         effects.hideSystemBars(window)
 
-        val movieDetails = intent.getParcelableExtra<MovieDetailsModel>("movie_details")
+
+        @Suppress("DEPRECATION")
+        val movieDetails = intent.getParcelableExtra<MovieDetailsModel>(getString(R.string.movie_details))
 
         if (movieDetails == null) {
             finish()
@@ -47,6 +48,7 @@ class MovieScreenActivity: ComponentActivity() {
         if (token != null) {
             lifecycleScope.launch {
                 val user = loadUserProfile(token)
+
                 if (user != null) {
                     setContent {
                         MovieScreen(
@@ -69,10 +71,6 @@ class MovieScreenActivity: ComponentActivity() {
         }
     }
 
-    private fun onBackButtonClick() {
-        finish()
-    }
-
     private fun onAddReview(movieId: String, rating: Int, reviewText: String, isAnonymous: Boolean) {
         val token = tokenManager.getToken(this)
 
@@ -81,7 +79,7 @@ class MovieScreenActivity: ComponentActivity() {
         if (token != null) {
             lifecycleScope.launch {
                 try {
-                    val response = reviewApi.addReview("Bearer ${token}", movieId, reviewBody)
+                    val response = reviewApi.addReview(getString(R.string.bearer) + " " +token, movieId, reviewBody)
 
                     if (response.isSuccessful) {
                         val movieResponse = movieApi.getMovieDetails(movieId)
@@ -90,7 +88,7 @@ class MovieScreenActivity: ComponentActivity() {
                             val updatedMovie = movieResponse.body()
 
                             val intent = Intent(this@MovieScreenActivity, MovieScreenActivity::class.java).apply {
-                                putExtra("movie_details", updatedMovie)
+                                putExtra(getString(R.string.movie_details), updatedMovie)
                             }
                             finish()
                             startActivity(intent)
@@ -122,7 +120,7 @@ class MovieScreenActivity: ComponentActivity() {
 
         if (token != null) {
             lifecycleScope.launch {
-                val response = reviewApi.deleteReview("Bearer ${token}", movieId, reviewId)
+                val response = reviewApi.deleteReview(getString(R.string.bearer) + " " + token, movieId, reviewId)
 
                 if (response.isSuccessful) {
                     val movieResponse = movieApi.getMovieDetails(movieId)
@@ -131,7 +129,7 @@ class MovieScreenActivity: ComponentActivity() {
                         val updatedMovie = movieResponse.body()
 
                         val intent = Intent(this@MovieScreenActivity, MovieScreenActivity::class.java).apply {
-                            putExtra("movie_details", updatedMovie)
+                            putExtra(getString(R.string.movie_details), updatedMovie)
                         }
                         finish()
                         startActivity(intent)
@@ -158,7 +156,7 @@ class MovieScreenActivity: ComponentActivity() {
         if (token != null) {
             lifecycleScope.launch {
                 try {
-                    val response = reviewApi.editReview("Bearer ${token}", movieId, reviewId, reviewBody)
+                    val response = reviewApi.editReview(getString(R.string.bearer) + " " + token, movieId, reviewId, reviewBody)
 
                     if (response.isSuccessful) {
                         val movieResponse = movieApi.getMovieDetails(movieId)
@@ -167,7 +165,7 @@ class MovieScreenActivity: ComponentActivity() {
                             val updatedMovie = movieResponse.body()
 
                             val intent = Intent(this@MovieScreenActivity, MovieScreenActivity::class.java).apply {
-                                putExtra("movie_details", updatedMovie)
+                                putExtra(getString(R.string.movie_details), updatedMovie)
                             }
                             finish()
                             startActivity(intent)
@@ -178,17 +176,17 @@ class MovieScreenActivity: ComponentActivity() {
 
                         when (response.code()) {
                             400 ->
-                                if (errorBody?.contains("already had review") == true) {
+                                if (errorBody?.contains(getString(R.string.already_had_review)) == true) {
                                 Toast.makeText(
                                     this@MovieScreenActivity,
-                                    "Нельзя изменить видимость автора отзыва",
+                                    getString(R.string.forbidden_to_edit),
                                     Toast.LENGTH_LONG
                                 ).show()
                                 }
                                 else {
                                     Toast.makeText(
                                         this@MovieScreenActivity,
-                                        "Ошибка редактирования: $errorBody",
+                                        getString(R.string.edit_error) + " " + errorBody,
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
@@ -226,6 +224,10 @@ class MovieScreenActivity: ComponentActivity() {
     private fun navigateToSignIn() {
         val intent = Intent(this, SignInActivity::class.java)
         startActivity(intent)
+        finish()
+    }
+
+    private fun onBackButtonClick() {
         finish()
     }
 }
