@@ -41,7 +41,7 @@ class MovieScreenActivity: ComponentActivity() {
                 val user = loadUserProfile(token)
                 if (user != null) {
                     setContent {
-                        MovieScreen(movie = movieDetails, user = user)
+                        MovieScreen(movie = movieDetails, user = user, onBackButtonClick = { onBackButtonClick() })
                     }
                 }
             }
@@ -49,6 +49,10 @@ class MovieScreenActivity: ComponentActivity() {
         else {
             navigateToSignIn()
         }
+    }
+
+    private fun onBackButtonClick() {
+        finish()
     }
 
     private suspend fun loadUserProfile(token: String): ProfileModel? {

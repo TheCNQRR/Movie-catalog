@@ -4,14 +4,12 @@ import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,14 +33,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -53,99 +49,192 @@ import com.example.moviecatalog.data.model.movie.MovieDetailsModel
 import com.example.moviecatalog.data.model.review.ReviewModel
 import com.example.moviecatalog.data.model.user.ProfileModel
 import com.squareup.picasso.Picasso
+import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
-fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel) {
-    Column(
+fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick: () -> Unit) {
+    val scrollState = rememberScrollState()
+    val progress = (scrollState.value / 150f).coerceIn(0f, 1f)
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(colorResource(R.color.background))
-            .verticalScroll(rememberScrollState())
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp)
+                .fillMaxSize()
+                .background(colorResource(R.color.background))
+                .verticalScroll(scrollState)
         ) {
-            PicassoImage(
-                url = movie.poster,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
-            )
+            ) {
+                PicassoImage(
+                    url = movie.poster,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color.Black.copy(alpha = 0.7f)
-                            ),
-                            startY = 0f,
-                            endY = Float.POSITIVE_INFINITY
-                        )
-                    )
-            )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = progress * 0.7f))
+                )
+
+                Text(
+                    text = movie.name,
+                    fontSize = (36 * (1 - progress * 0.5f)).sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White.copy(alpha = 1f - progress),
+                    maxLines = if (progress > 0.5f) 1 else 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .align(Alignment.BottomStart)
+                        .padding(16.dp)
+                )
+            }
 
             Text(
-                text = movie.name,
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
+                text = movie.description,
+                fontSize = 14.sp,
                 color = Color.White,
                 modifier = Modifier
                     .width(343.dp)
                     .wrapContentHeight()
-                    .align(Alignment.BottomStart)
                     .padding(
                         start = 16.dp,
-                        bottom = 16.dp
+                        top = 16.dp
                     )
             )
-        }
 
-        Text(
-            text = movie.description,
-            fontSize = 14.sp,
-            color = Color.White,
-            modifier = Modifier
-                .width(343.dp)
-                .wrapContentHeight()
-                .padding(
-                    start = 16.dp,
-                    top = 16.dp
+            val expanded = remember { mutableStateOf(false) }
+
+            Button(
+                onClick = {
+                    expanded.value = true
+                },
+                shape = RoundedCornerShape(4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(
+                        top = 16.dp,
+                        start = 16.dp,
+                        end = 16.dp
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.accent)
                 )
-        )
+            ) {
+                Text(
+                    text = stringResource(R.string.add_to_collection),
+                    fontSize = 16.sp,
+                    color = colorResource(R.color.white),
+                    textAlign = TextAlign.Center
+                )
 
-        Button(
-            onClick = {
-            //TODO добавить в коллекцию
-            },
-            shape = RoundedCornerShape(4.dp),
+//            DropdownMenu(
+//                expanded = expanded.value,
+//                onDismissRequest = { expanded.value = false },
+//                modifier = Modifier.background(Color.Black)
+//            ) {
+//                collectionsList.forEach { collection ->
+//                    DropdownMenuItem(
+//                        text = {
+//                            Text(
+//                                text = collection.,
+//                                color = Color.White,
+//                                modifier = Modifier.fillMaxWidth()
+//                            )
+//                        },
+//                        onClick = {
+//                            //TODO обработать выбор
+//                            expanded.value = false
+//                        }
+//                    )
+//                }
+//            }
+            }
+
+            AboutMovie(movie)
+            MovieGenres(movie)
+            Reviews(movie, user)
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .background(
+                color = colorResource(R.color.background).copy(alpha = progress)
+            )
+    ) {
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(
-                    top = 16.dp,
-                    start = 16.dp,
-                    end = 16.dp
-                    ),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(R.color.accent)
-            )
+                .padding(vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(R.string.add_to_collection),
-                fontSize = 16.sp,
-                color = colorResource(R.color.white),
-                textAlign = TextAlign.Center
-            )
-        }
+            Spacer(modifier = Modifier.width(20.dp))
 
-        AboutMovie(movie)
-        MovieGenres(movie)
-        Reviews(movie, user)
+            IconButton(
+                onClick = onBackButtonClick,
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(
+                        color = colorResource(R.color.toolbar_background).copy(alpha = progress),
+                        shape = CircleShape
+                    )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.toolbar_back),
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
+            }
+
+            Text(
+                text = movie.name,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White.copy(alpha = progress),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(
+                        start = 9.dp,
+                        end = 8.dp
+                    )
+                    .alpha(progress)
+            )
+
+            IconButton(
+                onClick = {  },
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(
+                        color = colorResource(R.color.toolbar_background).copy(alpha = progress),
+                        shape = CircleShape
+                    )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.toolbar_add_to_favorite),
+                    contentDescription = "Favorite",
+                    tint = colorResource(R.color.accent)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(20.dp))
+        }
     }
 }
 
