@@ -11,5 +11,5 @@ enum class Gender() {
     @SerialName("1")
     FEMALE
 
-    //TODO Нужен ли данный класс?
+    // TODO Нужен ли данный класс?
 }

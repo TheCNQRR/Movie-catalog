@@ -6,7 +6,7 @@ class Functions {
     fun calculateMovieRating(movie: MovieElementModel): Double {
         val reviews = movie.reviews
         if (reviews.isEmpty()) {
-            return  0.0
+            return 0.0
         }
 
         val rating: Double

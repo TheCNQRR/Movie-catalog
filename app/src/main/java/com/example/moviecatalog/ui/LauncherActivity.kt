@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.moviecatalog.logic.util.TokenManager
 
-class LauncherActivity: ComponentActivity() {
+class LauncherActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
@@ -16,8 +16,7 @@ class LauncherActivity: ComponentActivity() {
 
         val destinationActivity = if (tokenManager.getToken(this) != null) {
             MainScreenActivity::class.java
-        }
-        else {
+        } else {
             SignInActivity::class.java
         }
 

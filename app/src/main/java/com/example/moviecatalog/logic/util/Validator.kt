@@ -51,16 +51,16 @@ class Validator(private val context: Context) {
 
     fun isAllFieldsFilledRegistration(login: String, email: String, name: String, password: String, confirmPassword: String, birthDate: String, genderId: Int?): Boolean {
         return login.isNotEmpty() &&
-                email.isNotEmpty() &&
-                name.isNotEmpty() &&
-                password.isNotEmpty() &&
-                confirmPassword.isNotEmpty() &&
-                birthDate.isNotEmpty() &&
-                genderId != -1 && genderId != null
+            email.isNotEmpty() &&
+            name.isNotEmpty() &&
+            password.isNotEmpty() &&
+            confirmPassword.isNotEmpty() &&
+            birthDate.isNotEmpty() &&
+            genderId != -1 && genderId != null
     }
 
     fun isAllFieldsFilledLogin(login: String, password: String): Boolean {
         return login.isNotEmpty() &&
-                password.isNotEmpty()
+            password.isNotEmpty()
     }
 }

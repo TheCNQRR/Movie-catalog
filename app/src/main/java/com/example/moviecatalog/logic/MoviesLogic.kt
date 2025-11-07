@@ -1,7 +1,6 @@
 package com.example.moviecatalog.logic
 
 import android.content.Context
-import androidx.compose.ui.res.stringResource
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.MovieApi
 import com.example.moviecatalog.data.model.movie.MovieDetailsModel
@@ -12,7 +11,8 @@ class MoviesLogic(
     private val movieApi: MovieApi,
     private val onMoviesLoaded: (List<MovieElementModel>) -> Unit = {},
     private val onMovieDetailsLoaded: (MovieDetailsModel?) -> Unit = {},
-    private val onError: (String?) -> Unit = {}) {
+    private val onError: (String?) -> Unit = {}
+) {
     suspend fun getMovies(page: Int) {
         return try {
             val response = movieApi.getMovies(page)
@@ -20,8 +20,7 @@ class MoviesLogic(
             if (response.isSuccessful) {
                 val movies = response.body()?.movies ?: emptyList()
                 onMoviesLoaded(movies)
-            }
-            else {
+            } else {
                 onError(context.getString(R.string.error) + response.code())
             }
         } catch (e: Exception) {
@@ -36,8 +35,7 @@ class MoviesLogic(
             if (response.isSuccessful) {
                 val movieDetails = response.body()
                 onMovieDetailsLoaded(movieDetails)
-            }
-            else {
+            } else {
                 onError(context.getString(R.string.error) + response.code())
             }
         } catch (e: Exception) {

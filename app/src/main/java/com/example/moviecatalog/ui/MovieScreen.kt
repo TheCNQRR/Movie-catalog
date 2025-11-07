@@ -59,17 +59,17 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.model.movie.MovieDetailsModel
 import com.example.moviecatalog.data.model.review.ReviewModel
 import com.example.moviecatalog.data.model.user.ProfileModel
-import com.squareup.picasso.Picasso
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.window.Dialog
 import com.example.moviecatalog.logic.util.Functions
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.delay
 
 @Composable
@@ -202,7 +202,8 @@ fun MovieScreen(
                 onEditReview = { review ->
                     editingReview.value = review
                     showDialog.value = true
-                })
+                }
+            )
         }
     }
 
@@ -263,7 +264,7 @@ fun MovieScreen(
                         shape = CircleShape
                     ),
                 onClick = {
-                    //TODO добавление фильма в избранное
+                    // TODO добавление фильма в избранное
                 },
             ) {
                 Icon(
@@ -353,7 +354,6 @@ fun AboutMovie(movie: MovieDetailsModel) {
         val maxWidth = 100.dp
 
         if (fieldPairs.isNotEmpty()) {
-
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -591,8 +591,7 @@ fun Review(
                                     .fillMaxSize()
                                     .clip(CircleShape)
                             )
-                        }
-                        else {
+                        } else {
                             Icon(
                                 painter = painterResource(R.drawable.default_user_icon),
                                 contentDescription = stringResource(R.string.default_avatar),
@@ -609,7 +608,9 @@ fun Review(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = if (review.isAnonymous) stringResource(R.string.anonymous_user) else review.author?.nickName!!,
+                            text = if (review.isAnonymous) stringResource(
+                                R.string.anonymous_user
+                            ) else review.author?.nickName!!,
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
                             color = colorResource(R.color.white)
@@ -690,7 +691,7 @@ fun Review(
                                 )
                                 .clickable {
                                     onEditReview(review)
-                                           },
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -711,8 +712,8 @@ fun Review(
                                     shape = CircleShape
                                 )
                                 .clickable {
-                                onDeleteReview(movie.id, review.id)
-                            },
+                                    onDeleteReview(movie.id, review.id)
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -755,8 +756,7 @@ fun ReviewDialog(
                 colorResource(R.color.background).copy(alpha = 0.8f)
             ),
         contentAlignment = Alignment.Center
-    )
-    {
+    ) {
         Column(
             modifier = Modifier
                 .width(328.dp)
@@ -795,8 +795,7 @@ fun ReviewDialog(
                     ) {
                         val iconStar = if (starIndex <= rating.intValue) {
                             painterResource(R.drawable.star_filled)
-                        }
-                        else {
+                        } else {
                             painterResource(R.drawable.rating_star)
                         }
 
@@ -822,8 +821,7 @@ fun ReviewDialog(
                             contentDescription = stringResource(R.string.star),
                             tint = if (starIndex <= rating.intValue) {
                                 colorResource(R.color.accent)
-                            }
-                            else {
+                            } else {
                                 colorResource(R.color.gray_faded)
                             }
                         )
@@ -920,13 +918,11 @@ fun ReviewDialog(
                     if (reviewText.value.isNotBlank()) {
                         if (editingReview != null) {
                             onEditReview(movie.id, editingReview.id, rating.intValue, reviewText.value, checkIcon.value)
-                        }
-                        else {
+                        } else {
                             onAddReview(movie.id, rating.intValue, reviewText.value, checkIcon.value)
                         }
                         onDismiss()
-                    }
-                    else {
+                    } else {
                         showError.value = true
                     }
                 },

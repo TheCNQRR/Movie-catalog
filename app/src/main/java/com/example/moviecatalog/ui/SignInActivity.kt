@@ -21,7 +21,7 @@ import com.example.moviecatalog.logic.util.TokenManager
 import com.example.moviecatalog.logic.util.Validator
 import kotlinx.coroutines.launch
 
-class SignInActivity: AppCompatActivity() {
+class SignInActivity : AppCompatActivity() {
     private lateinit var binding: SignInScreenBinding
     private val effects = Effects()
     private val validator = Validator(this)

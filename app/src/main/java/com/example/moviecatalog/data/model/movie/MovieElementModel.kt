@@ -15,4 +15,4 @@ data class MovieElementModel(
     val country: String,
     val genres: List<GenreModel>,
     val reviews: List<ReviewShortModel>
-): Parcelable
+) : Parcelable

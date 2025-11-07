@@ -8,7 +8,6 @@ import com.example.moviecatalog.data.model.auth.UserRegisterModel
 import com.example.moviecatalog.logic.util.TokenManager
 import com.example.moviecatalog.logic.util.Validator
 
-
 class AuthLogic(
     private val authApi: AuthApi,
     private val tokenManager: TokenManager,
@@ -21,7 +20,15 @@ class AuthLogic(
     suspend fun registerUser(login: String, email: String, name: String, password: String, confirmPassword: String, birthDate: String, gender: Int?) {
         onClearErrors()
 
-        val errorMessage = authValidator.validateRegistration(login, email, name, password, confirmPassword, birthDate, gender)
+        val errorMessage = authValidator.validateRegistration(
+            login,
+            email,
+            name,
+            password,
+            confirmPassword,
+            birthDate,
+            gender
+        )
 
         if (errorMessage != null) {
             onError(errorMessage)
@@ -37,8 +44,7 @@ class AuthLogic(
             val token = tokenResponse?.accessToken ?: ""
             tokenManager.saveToken(context, token)
             onSuccess()
-        }
-        else {
+        } else {
             when (response.code()) {
                 400 -> onError(context.getString(R.string.check_fields_are_correct))
                 500 -> onError(context.getString(R.string.server_error))
@@ -62,8 +68,7 @@ class AuthLogic(
             tokenManager.saveToken(context, token)
 
             onSuccess()
-        }
-        else {
+        } else {
             when (response.code()) {
                 400 -> onError(context.getString(R.string.wrong_login_or_password))
                 500 -> onError(context.getString(R.string.server_error))

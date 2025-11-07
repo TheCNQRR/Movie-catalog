@@ -9,4 +9,4 @@ import kotlinx.serialization.Serializable
 data class GenreModel(
     val id: String,
     val name: String
-): Parcelable
+) : Parcelable

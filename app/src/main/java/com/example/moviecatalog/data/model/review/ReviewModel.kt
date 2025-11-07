@@ -14,4 +14,4 @@ data class ReviewModel(
     val isAnonymous: Boolean,
     val createDateTime: String?,
     val author: UserShortModel?
-): Parcelable
+) : Parcelable

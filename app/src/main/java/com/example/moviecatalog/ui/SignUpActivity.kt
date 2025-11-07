@@ -72,7 +72,6 @@ class SignUpActivity : AppCompatActivity() {
                     .build()
             datePicker.show(supportFragmentManager, "DATE_PICKER_TAG")
 
-
             datePicker.addOnPositiveButtonClickListener { selectedDate ->
                 val calendar = Calendar.getInstance().apply {
                     timeInMillis = selectedDate
@@ -84,7 +83,10 @@ class SignUpActivity : AppCompatActivity() {
                 val date = "$day.$month.$year"
                 binding.birthDate.text = date
 
-                val apiDate = "${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T00:00:00.000Z"
+                val apiDate = "$year-${month.toString().padStart(
+                    2,
+                    '0'
+                )}-${day.toString().padStart(2, '0')}T00:00:00.000Z"
 
                 selectedBirthDate = apiDate
             }
@@ -99,7 +101,7 @@ class SignUpActivity : AppCompatActivity() {
             val password = binding.password.text.toString()
             val confirmPassword = binding.confirmPassword.text.toString()
             val birthDate = selectedBirthDate
-            val gender = when ( binding.genderSelector.checkedRadioButtonId) {
+            val gender = when (binding.genderSelector.checkedRadioButtonId) {
                 R.id.male -> 0
                 R.id.female -> 1
                 else -> null
@@ -146,7 +148,15 @@ class SignUpActivity : AppCompatActivity() {
         val birthDate = binding.birthDate.text.toString()
         val genderId = binding.genderSelector.checkedRadioButtonId
 
-        val allFieldsFilled = validator.isAllFieldsFilledRegistration(login, email, name, password, confirmPassword, birthDate, genderId)
+        val allFieldsFilled = validator.isAllFieldsFilledRegistration(
+            login,
+            email,
+            name,
+            password,
+            confirmPassword,
+            birthDate,
+            genderId
+        )
 
         if (allFieldsFilled) {
             binding.registerInTheApp.setBackgroundResource(R.drawable.active_button)

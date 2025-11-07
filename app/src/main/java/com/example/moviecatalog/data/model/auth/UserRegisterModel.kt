@@ -1,6 +1,5 @@
 package com.example.moviecatalog.data.model.auth
 
-import com.example.moviecatalog.data.model.user.Gender
 import kotlinx.serialization.Serializable
 
 @Serializable

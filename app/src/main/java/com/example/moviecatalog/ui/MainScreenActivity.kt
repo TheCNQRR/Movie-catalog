@@ -21,21 +21,18 @@ import com.example.moviecatalog.logic.MoviesLogic
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 
-class MainScreenActivity: AppCompatActivity() {
+class MainScreenActivity : AppCompatActivity() {
     private lateinit var binding: MainScreenBinding
     private val effects = Effects()
     private lateinit var moviesLogic: MoviesLogic
 
     private val galleryAdapter = GalleryAdapter { movie ->
         lifecycleScope.launch {
-            println("🟡 Loading movie details for: ${movie.name} (ID: ${movie.id})")
-
             val moviesLogic = MoviesLogic(
                 context = this@MainScreenActivity,
                 movieApi = RetrofitClient.getMovieApi(),
                 onMoviesLoaded = {},
                 onMovieDetailsLoaded = { details ->
-                    println("✅ Successfully loaded movie details: ${details!!.name}")
                     runOnUiThread {
                         val intent = Intent(this@MainScreenActivity, MovieScreenActivity::class.java).apply {
                             putExtra(getString(R.string.movie_details), details)
@@ -43,14 +40,9 @@ class MainScreenActivity: AppCompatActivity() {
                         startActivity(intent)
                     }
                 },
-                onError = { errorMessage ->
-                    println("❌ Error loading movie details: $errorMessage")
+                onError = { _ ->
                     runOnUiThread {
-                        Toast.makeText(
-                            this@MainScreenActivity,
-                            "Ошибка загрузки: $errorMessage",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Toast.makeText(this@MainScreenActivity, getString(R.string.load_error), Toast.LENGTH_SHORT).show()
                     }
                 }
             )
@@ -92,8 +84,7 @@ class MainScreenActivity: AppCompatActivity() {
                     hasMorePages = true
                     isFirstLoad = false
                     setUpUI()
-                }
-                else {
+                } else {
                     if (movies.isNotEmpty()) {
                         currentMovies = currentMovies + movies
                         currentPage++
@@ -139,10 +130,10 @@ class MainScreenActivity: AppCompatActivity() {
     }
 
     private fun showPoster(promotedMovie: MovieElementModel) {
-            Picasso.get()
-                .load(promotedMovie.poster)
-                .fit()
-                .into(binding.moviePoster)
+        Picasso.get()
+            .load(promotedMovie.poster)
+            .fit()
+            .into(binding.moviePoster)
     }
 
     private fun setUpUI() {
@@ -152,7 +143,7 @@ class MainScreenActivity: AppCompatActivity() {
             currentMovies = currentMovies.filterIndexed { index, _ -> index != 0 }
             addMoviesToGallery(currentMovies)
         }
-        setupFavoriteMovies(emptyList()) //TODO передавать избранное пользователя
+        setupFavoriteMovies(emptyList()) // TODO передавать избранное пользователя
     }
 
     private fun setupFavoriteMovies(favoriteMovies: List<MovieElementModel>) {

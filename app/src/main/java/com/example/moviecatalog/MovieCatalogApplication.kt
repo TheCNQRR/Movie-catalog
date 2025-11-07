@@ -4,5 +4,5 @@ import android.app.Application
 import com.example.moviecatalog.logic.util.TokenManager
 
 class MovieCatalogApplication : Application() {
-        val tokenManager = TokenManager()
+    val tokenManager = TokenManager()
 }

@@ -19,21 +19,23 @@ class ProfileLogic(
 
         return if (response.isSuccessful) {
             response.body()
-        }
-        else {
+        } else {
             when (response.code()) {
                 401 -> {
                     try {
                         authApi.logout()
-                    }
-                    catch (e: Exception) {
+                    } catch (e: Exception) {
                         println(e.message)
                     }
                     onLogout()
                     null
                 }
-                else ->  {
-                    Toast.makeText(context, context.getString(R.string.error) + response.code(), Toast.LENGTH_SHORT).show()
+                else -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.error) + response.code(),
+                        Toast.LENGTH_SHORT
+                    ).show()
                     null
                 }
             }

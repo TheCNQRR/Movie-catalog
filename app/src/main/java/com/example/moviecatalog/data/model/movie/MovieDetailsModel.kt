@@ -22,4 +22,4 @@ data class MovieDetailsModel(
     val budget: Int?,
     val fees: Int?,
     val ageLimit: Int?
-): Parcelable
+) : Parcelable

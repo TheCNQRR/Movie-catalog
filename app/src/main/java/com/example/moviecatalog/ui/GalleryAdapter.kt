@@ -1,7 +1,6 @@
 package com.example.moviecatalog.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviecatalog.R
@@ -14,8 +13,8 @@ import java.util.Locale
 class GalleryAdapter(
     private var movies: List<MovieElementModel> = emptyList(),
     private val onMovieClick: (MovieElementModel) -> Unit = {}
-): RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder>() {
-    class GalleryViewHolder(private val binding: MovieItemInGalleryBinding): RecyclerView.ViewHolder(binding.root) {
+) : RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder>() {
+    class GalleryViewHolder(private val binding: MovieItemInGalleryBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(movie: MovieElementModel, onMovieClick: (MovieElementModel) -> Unit) = with(binding) {
             val movieRating = Functions().calculateMovieRating(movie)
@@ -24,10 +23,10 @@ class GalleryAdapter(
                 movieRating > 9 && movieRating <= 10 -> R.drawable.rating_masterprice
                 movieRating > 8 && movieRating <= 9 -> R.drawable.rating_excellent
                 movieRating > 7 && movieRating <= 8 -> R.drawable.rating_very_good
-                movieRating > 6 && movieRating <= 7-> R.drawable.rating_good
+                movieRating > 6 && movieRating <= 7 -> R.drawable.rating_good
                 movieRating > 5 && movieRating <= 6 -> R.drawable.rating_decent
                 movieRating > 4 && movieRating <= 5 -> R.drawable.rating_average
-                movieRating > 3 &&  movieRating <= 4 -> R.drawable.rating_below_average
+                movieRating > 3 && movieRating <= 4 -> R.drawable.rating_below_average
                 movieRating > 2 && movieRating <= 3 -> R.drawable.rating_poor
                 movieRating > 1 && movieRating <= 2 -> R.drawable.rating_very_poor
                 movieRating in 0.0..1.0 -> R.drawable.rating_awful

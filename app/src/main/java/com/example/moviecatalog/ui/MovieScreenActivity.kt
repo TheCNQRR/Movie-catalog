@@ -4,8 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.activity.compose.setContent
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
 import com.example.moviecatalog.R
@@ -17,7 +17,7 @@ import com.example.moviecatalog.logic.ProfileLogic
 import com.example.moviecatalog.logic.util.TokenManager
 import kotlinx.coroutines.launch
 
-class MovieScreenActivity: ComponentActivity() {
+class MovieScreenActivity : ComponentActivity() {
     private val effects = Effects()
     private val userApi = RetrofitClient.getUserApi()
     private val tokenManager = TokenManager()
@@ -33,7 +33,6 @@ class MovieScreenActivity: ComponentActivity() {
         window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
         effects.hideSystemBars(window)
-
 
         @Suppress("DEPRECATION")
         val movieDetails = intent.getParcelableExtra<MovieDetailsModel>(getString(R.string.movie_details))
@@ -56,17 +55,19 @@ class MovieScreenActivity: ComponentActivity() {
                             user = user,
                             onBackButtonClick = { onBackButtonClick() },
                             onAddReview = { movieId, rating, reviewText, isAnonymous ->
-                                onAddReview(movieId, rating, reviewText, isAnonymous) },
+                                onAddReview(movieId, rating, reviewText, isAnonymous)
+                            },
                             onDeleteReview = { movieId, reviewId ->
-                                onDeleteReview(movieId, reviewId) },
+                                onDeleteReview(movieId, reviewId)
+                            },
                             onEditReview = { movieId, reviewId, rating, reviewText, isAnonymous ->
-                                onEditReview(movieId, reviewId, rating, reviewText, isAnonymous) }
+                                onEditReview(movieId, reviewId, rating, reviewText, isAnonymous)
+                            }
                         )
                     }
                 }
             }
-        }
-        else {
+        } else {
             navigateToSignIn()
         }
     }
@@ -79,7 +80,7 @@ class MovieScreenActivity: ComponentActivity() {
         if (token != null) {
             lifecycleScope.launch {
                 try {
-                    val response = reviewApi.addReview(getString(R.string.bearer) + " " +token, movieId, reviewBody)
+                    val response = reviewApi.addReview(getString(R.string.bearer) + " " + token, movieId, reviewBody)
 
                     if (response.isSuccessful) {
                         val movieResponse = movieApi.getMovieDetails(movieId)
@@ -93,30 +94,30 @@ class MovieScreenActivity: ComponentActivity() {
                             finish()
                             startActivity(intent)
                         }
-                    }
-                    else {
+                    } else {
                         when (response.code()) {
                             401 -> {
                                 navigateToSignIn()
                                 tokenManager.clearToken(this@MovieScreenActivity)
                             }
-                            else -> Toast.makeText(this@MovieScreenActivity, getString(R.string.error) + " " + response.code(), Toast.LENGTH_SHORT).show()
+                            else -> Toast.makeText(
+                                this@MovieScreenActivity,
+                                getString(R.string.error) + " " + response.code(),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     Toast.makeText(this@MovieScreenActivity, e.message, Toast.LENGTH_SHORT).show()
                 }
             }
-        }
-        else {
+        } else {
             navigateToSignIn()
         }
     }
 
     private fun onDeleteReview(movieId: String, reviewId: String) {
         val token = tokenManager.getToken(this)
-
 
         if (token != null) {
             lifecycleScope.launch {
@@ -134,14 +135,17 @@ class MovieScreenActivity: ComponentActivity() {
                         finish()
                         startActivity(intent)
                     }
-                }
-                else {
+                } else {
                     when (response.code()) {
                         401 -> {
                             navigateToSignIn()
                             tokenManager.clearToken(this@MovieScreenActivity)
                         }
-                        else -> Toast.makeText(this@MovieScreenActivity, getString(R.string.error) + " " + response.code(), Toast.LENGTH_SHORT).show()
+                        else -> Toast.makeText(
+                            this@MovieScreenActivity,
+                            getString(R.string.error) + " " + response.code(),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -156,7 +160,12 @@ class MovieScreenActivity: ComponentActivity() {
         if (token != null) {
             lifecycleScope.launch {
                 try {
-                    val response = reviewApi.editReview(getString(R.string.bearer) + " " + token, movieId, reviewId, reviewBody)
+                    val response = reviewApi.editReview(
+                        getString(R.string.bearer) + " " + token,
+                        movieId,
+                        reviewId,
+                        reviewBody
+                    )
 
                     if (response.isSuccessful) {
                         val movieResponse = movieApi.getMovieDetails(movieId)
@@ -170,20 +179,18 @@ class MovieScreenActivity: ComponentActivity() {
                             finish()
                             startActivity(intent)
                         }
-                    }
-                    else {
+                    } else {
                         val errorBody = response.errorBody()?.string()
 
                         when (response.code()) {
                             400 ->
                                 if (errorBody?.contains(getString(R.string.already_had_review)) == true) {
-                                Toast.makeText(
-                                    this@MovieScreenActivity,
-                                    getString(R.string.forbidden_to_edit),
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                }
-                                else {
+                                    Toast.makeText(
+                                        this@MovieScreenActivity,
+                                        getString(R.string.forbidden_to_edit),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
                                     Toast.makeText(
                                         this@MovieScreenActivity,
                                         getString(R.string.edit_error) + " " + errorBody,
@@ -195,16 +202,18 @@ class MovieScreenActivity: ComponentActivity() {
                                 navigateToSignIn()
                                 tokenManager.clearToken(this@MovieScreenActivity)
                             }
-                            else -> Toast.makeText(this@MovieScreenActivity, getString(R.string.error) + " " + response.code(), Toast.LENGTH_SHORT).show()
+                            else -> Toast.makeText(
+                                this@MovieScreenActivity,
+                                getString(R.string.error) + " " + response.code(),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     Toast.makeText(this@MovieScreenActivity, e.message, Toast.LENGTH_SHORT).show()
                 }
             }
-        }
-        else {
+        } else {
             navigateToSignIn()
         }
     }
@@ -215,8 +224,7 @@ class MovieScreenActivity: ComponentActivity() {
                 navigateToSignIn()
             })
             profileLogic.getUser()
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             null
         }
     }
