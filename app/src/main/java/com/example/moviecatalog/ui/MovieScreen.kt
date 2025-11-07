@@ -479,6 +479,7 @@ fun Reviews(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -608,9 +609,13 @@ fun Review(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = if (review.isAnonymous) stringResource(
-                                R.string.anonymous_user
-                            ) else review.author?.nickName!!,
+                            text = if (review.isAnonymous) {
+                                stringResource(
+                                    R.string.anonymous_user
+                                )
+                            } else {
+                                review.author?.nickName!!
+                            },
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
                             color = colorResource(R.color.white)

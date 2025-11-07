@@ -4,6 +4,9 @@ import android.content.Context
 import com.example.moviecatalog.R
 
 class Validator(private val context: Context) {
+    companion object {
+        private const val MIN_PASSWORD_LENGHT = 6
+    }
     fun validateRegistration(login: String, email: String, name: String, password: String, confirmPassword: String, birthDate: String, gender: Int?): String? {
         val loginError = isValidLogin(login)
         return when {
@@ -11,7 +14,7 @@ class Validator(private val context: Context) {
             email.isBlank() -> context.getString(R.string.fill_email)
             name.isBlank() -> context.getString(R.string.fill_name)
             password.isBlank() -> context.getString(R.string.fill_password)
-            password.length < 6 -> context.getString(R.string.password_too_short)
+            password.length < MIN_PASSWORD_LENGHT -> context.getString(R.string.password_too_short)
             birthDate.isBlank() -> context.getString(R.string.fill_birth_date)
             gender == null -> context.getString(R.string.select_gender)
             !isValidEmail(email) -> context.getString(R.string.incorrect_email)
@@ -44,12 +47,20 @@ class Validator(private val context: Context) {
     private fun isValidPassword(password: String): String? {
         return when {
             password.isBlank() -> context.getString(R.string.fill_password)
-            password.length < 6 -> context.getString(R.string.password_too_short)
+            password.length < MIN_PASSWORD_LENGHT -> context.getString(R.string.password_too_short)
             else -> null
         }
     }
 
-    fun isAllFieldsFilledRegistration(login: String, email: String, name: String, password: String, confirmPassword: String, birthDate: String, genderId: Int?): Boolean {
+    fun isAllFieldsFilledRegistration(
+        login: String,
+        email: String,
+        name: String,
+        password: String,
+        confirmPassword: String,
+        birthDate: String,
+        genderId: Int?
+    ): Boolean {
         return login.isNotEmpty() &&
             email.isNotEmpty() &&
             name.isNotEmpty() &&

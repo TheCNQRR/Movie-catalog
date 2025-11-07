@@ -22,6 +22,13 @@ import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 
 class MainScreenActivity : AppCompatActivity() {
+    companion object {
+        private const val NORMAL_SCALE = 1f
+        private const val SMALL_SCALE = 0.83f
+        private const val PADDING = 500
+        private const val ZERO = 0
+        private const val DURATION = 150L
+    }
     private lateinit var binding: MainScreenBinding
     private val effects = Effects()
     private lateinit var moviesLogic: MoviesLogic
@@ -42,7 +49,11 @@ class MainScreenActivity : AppCompatActivity() {
                 },
                 onError = { _ ->
                     runOnUiThread {
-                        Toast.makeText(this@MainScreenActivity, getString(R.string.load_error), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@MainScreenActivity,
+                            getString(R.string.load_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             )
@@ -140,7 +151,7 @@ class MainScreenActivity : AppCompatActivity() {
         if (currentMovies.isNotEmpty()) {
             val firstMovie = currentMovies.first()
             showPoster(firstMovie)
-            currentMovies = currentMovies.filterIndexed { index, _ -> index != 0 }
+            currentMovies = currentMovies.filterIndexed { index, _ -> index != ZERO }
             addMoviesToGallery(currentMovies)
         }
         setupFavoriteMovies(emptyList()) // TODO передавать избранное пользователя
@@ -177,8 +188,8 @@ class MainScreenActivity : AppCompatActivity() {
             val cardView = movieView.findViewById<CardView>(R.id.card_view)
             val poster = movieView.findViewById<ImageView>(R.id.movie_poster)
 
-            cardView.scaleX = 1f
-            cardView.scaleY = 1f
+            cardView.scaleX = NORMAL_SCALE
+            cardView.scaleY = NORMAL_SCALE
 
             Picasso.get().load(movie.poster).into(poster)
 
@@ -198,7 +209,7 @@ class MainScreenActivity : AppCompatActivity() {
         val scrollView = binding.horizontalScrollForMovies
         val container = binding.moviesContainer
 
-        var firstVisiblePosition = 0
+        var firstVisiblePosition = ZERO
         var minLeft = Int.MAX_VALUE
 
         for (i in 0 until container.childCount) {
@@ -212,14 +223,14 @@ class MainScreenActivity : AppCompatActivity() {
             }
         }
 
-        for (i in 0 until container.childCount) {
+        for (i in ZERO until container.childCount) {
             val cardView = container.getChildAt(i) as CardView
-            val scale = if (i == firstVisiblePosition) 1f else 0.83f
+            val scale = if (i == firstVisiblePosition) NORMAL_SCALE else SMALL_SCALE
 
             cardView.animate()
                 .scaleX(scale)
                 .scaleY(scale)
-                .setDuration(150)
+                .setDuration(DURATION)
                 .start()
         }
     }
@@ -242,7 +253,7 @@ class MainScreenActivity : AppCompatActivity() {
             val galleryContainer = binding.galleryContainer
             val galleryBottom = galleryContainer.bottom
 
-            if (galleryBottom <= scrollView.height + scrollView.scrollY + 500) {
+            if (galleryBottom <= scrollView.height + scrollView.scrollY + PADDING) {
                 loadNextPage()
             }
         }

@@ -3,6 +3,10 @@ package com.example.moviecatalog.logic.util
 import com.example.moviecatalog.data.model.movie.MovieElementModel
 
 class Functions {
+    companion object {
+        private const val ZERO = 0
+        private const val CATEGORY = 3
+    }
     fun calculateMovieRating(movie: MovieElementModel): Double {
         val reviews = movie.reviews
         if (reviews.isEmpty()) {
@@ -26,7 +30,7 @@ class Functions {
         val result = StringBuilder()
 
         for ((count, i) in (numberString.length - 1 downTo 0).withIndex()) {
-            if (count > 0 && count % 3 == 0) {
+            if (count > ZERO && count % CATEGORY == ZERO) {
                 result.append(' ')
             }
             result.append(numberString[i])

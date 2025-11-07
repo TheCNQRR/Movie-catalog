@@ -36,106 +36,148 @@ class SignUpActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        setupWindow()
+        setupBinding()
+        setupWindowInsets()
+        setupTouchListener()
+        setupClickListeners()
+        setupTextWatcher()
+    }
 
+    private fun setupWindow() {
+        window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        effects.hideSystemBars(window)
+    }
+
+    private fun setupBinding() {
         binding = SignUpScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
+    }
 
-        effects.hideSystemBars(window)
-
+    private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupTouchListener() {
         binding.root.setOnTouchListener { _, event ->
             if (event.action == android.view.MotionEvent.ACTION_DOWN) {
                 effects.hideKeyboardAndClearFocus(this, currentFocus)
             }
             false
         }
+    }
 
+    private fun setupClickListeners() {
+        setupHaveAccountClickListener()
+        setupBirthDateClickListener()
+        setupRegisterButtonClickListener()
+    }
+
+    private fun setupHaveAccountClickListener() {
         binding.haveAccount.setOnClickListener {
             effects.onButtonClick(binding.haveAccount)
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
             finish()
         }
+    }
 
+    private fun setupBirthDateClickListener() {
         binding.birthDate.setOnClickListener {
-            val datePicker =
-                MaterialDatePicker.Builder.datePicker()
-                    .setTitleText(getString(R.string.select_date))
-                    .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                    .setTheme(R.style.ThemeOverlay_MovieCatalog_DatePicker)
-                    .build()
-            datePicker.show(supportFragmentManager, "DATE_PICKER_TAG")
-
-            datePicker.addOnPositiveButtonClickListener { selectedDate ->
-                val calendar = Calendar.getInstance().apply {
-                    timeInMillis = selectedDate
-                }
-                val day = calendar.get(Calendar.DAY_OF_MONTH)
-                val month = calendar.get(Calendar.MONTH) + 1
-                val year = calendar.get(Calendar.YEAR)
-
-                val date = "$day.$month.$year"
-                binding.birthDate.text = date
-
-                val apiDate = "$year-${month.toString().padStart(
-                    2,
-                    '0'
-                )}-${day.toString().padStart(2, '0')}T00:00:00.000Z"
-
-                selectedBirthDate = apiDate
-            }
+            showDatePicker()
         }
+    }
 
-        setupTextWatcher()
+    private fun showDatePicker() {
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(getString(R.string.select_date))
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .setTheme(R.style.ThemeOverlay_MovieCatalog_DatePicker)
+            .build()
 
+        datePicker.show(supportFragmentManager, "DATE_PICKER_TAG")
+        datePicker.addOnPositiveButtonClickListener { selectedDate ->
+            handleDateSelection(selectedDate)
+        }
+    }
+
+    private fun handleDateSelection(selectedDate: Long) {
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = selectedDate
+        }
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val month = calendar.get(Calendar.MONTH) + 1
+        val year = calendar.get(Calendar.YEAR)
+
+        val date = "$day.$month.$year"
+        binding.birthDate.text = date
+
+        selectedBirthDate = formatDateForApi(year, month, day)
+    }
+
+    private fun formatDateForApi(year: Int, month: Int, day: Int): String {
+        return "$year-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T00:00:00.000Z"
+    }
+
+    private fun setupRegisterButtonClickListener() {
         binding.registerInTheApp.setOnClickListener {
-            val login = binding.login.text.toString()
-            val email = binding.email.text.toString()
-            val name = binding.name.text.toString()
-            val password = binding.password.text.toString()
-            val confirmPassword = binding.confirmPassword.text.toString()
-            val birthDate = selectedBirthDate
-            val gender = when (binding.genderSelector.checkedRadioButtonId) {
-                R.id.male -> 0
-                R.id.female -> 1
-                else -> null
-            }
-
             effects.onButtonClick(binding.registerInTheApp)
+            registerUser()
+        }
+    }
 
-            val authLogic = AuthLogic(
-                authApi = RetrofitClient.getAuthApi(),
-                tokenManager = getTokenManager(),
-                context = this,
-                onError = { message ->
-                    binding.errorMessage.text = message
-                    binding.errorMessage.visibility = View.VISIBLE
-                },
-                onClearErrors = { binding.errorMessage.visibility = View.GONE },
-                onSuccess = {
-                    val intent = Intent(this, SignInActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
+    private fun registerUser() {
+        val login = binding.login.text.toString()
+        val email = binding.email.text.toString()
+        val name = binding.name.text.toString()
+        val password = binding.password.text.toString()
+        val confirmPassword = binding.confirmPassword.text.toString()
+        val birthDate = selectedBirthDate
+        val gender = getSelectedGender()
+
+        val authLogic = createAuthLogic()
+
+        lifecycleScope.launch {
+            authLogic.registerUser(
+                login,
+                email,
+                name,
+                password,
+                confirmPassword,
+                birthDate,
+                gender
             )
+        }
+    }
 
-            lifecycleScope.launch {
-                authLogic.registerUser(
-                    login,
-                    email,
-                    name,
-                    password,
-                    confirmPassword,
-                    birthDate,
-                    gender
-                )
+    private fun createAuthLogic(): AuthLogic {
+        return AuthLogic(
+            authApi = RetrofitClient.getAuthApi(),
+            tokenManager = getTokenManager(),
+            context = this,
+            onError = { message ->
+                binding.errorMessage.text = message
+                binding.errorMessage.visibility = View.VISIBLE
+            },
+            onClearErrors = { binding.errorMessage.visibility = View.GONE },
+            onSuccess = {
+                val intent = Intent(this, SignInActivity::class.java)
+                startActivity(intent)
+                finish()
             }
+        )
+    }
+
+    private fun getSelectedGender(): Int? {
+        return when (binding.genderSelector.checkedRadioButtonId) {
+            R.id.male -> 0
+            R.id.female -> 1
+            else -> null
         }
     }
 
@@ -169,8 +211,8 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun setupTextWatcher() {
         val textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
             override fun afterTextChanged(s: Editable?) {
                 checkFieldsAndUpdateButton()
             }

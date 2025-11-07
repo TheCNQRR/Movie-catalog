@@ -10,16 +10,21 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
 class Effects {
+    companion object {
+        private const val SMALL_SCALE = 0.8f
+        private const val NORMAL_SCALE = 1f
+        private const val DURATION = 100L
+    }
     fun onButtonClick(view: View) {
         view.animate()
-            .scaleX(0.8f)
-            .scaleY(0.8f)
-            .setDuration(100)
+            .scaleX(SMALL_SCALE)
+            .scaleY(SMALL_SCALE)
+            .setDuration(DURATION)
             .withEndAction {
                 view.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(100)
+                    .scaleX(NORMAL_SCALE)
+                    .scaleY(NORMAL_SCALE)
+                    .setDuration(DURATION)
                     .start()
             }
             .start()

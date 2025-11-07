@@ -18,6 +18,10 @@ import com.example.moviecatalog.logic.util.TokenManager
 import kotlinx.coroutines.launch
 
 class MovieScreenActivity : ComponentActivity() {
+    companion object {
+        private const val HHTP_BAD_REQUEST = 400
+        private const val HTTP_UNAUTHORIZED = 401
+    }
     private val effects = Effects()
     private val userApi = RetrofitClient.getUserApi()
     private val tokenManager = TokenManager()
@@ -96,7 +100,7 @@ class MovieScreenActivity : ComponentActivity() {
                         }
                     } else {
                         when (response.code()) {
-                            401 -> {
+                            HTTP_UNAUTHORIZED -> {
                                 navigateToSignIn()
                                 tokenManager.clearToken(this@MovieScreenActivity)
                             }
@@ -137,7 +141,7 @@ class MovieScreenActivity : ComponentActivity() {
                     }
                 } else {
                     when (response.code()) {
-                        401 -> {
+                        HTTP_UNAUTHORIZED -> {
                             navigateToSignIn()
                             tokenManager.clearToken(this@MovieScreenActivity)
                         }
@@ -183,7 +187,7 @@ class MovieScreenActivity : ComponentActivity() {
                         val errorBody = response.errorBody()?.string()
 
                         when (response.code()) {
-                            400 ->
+                            HHTP_BAD_REQUEST ->
                                 if (errorBody?.contains(getString(R.string.already_had_review)) == true) {
                                     Toast.makeText(
                                         this@MovieScreenActivity,
@@ -198,7 +202,7 @@ class MovieScreenActivity : ComponentActivity() {
                                     ).show()
                                 }
 
-                            401 -> {
+                            HTTP_UNAUTHORIZED -> {
                                 navigateToSignIn()
                                 tokenManager.clearToken(this@MovieScreenActivity)
                             }

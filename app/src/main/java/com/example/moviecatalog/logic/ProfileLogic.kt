@@ -14,6 +14,9 @@ class ProfileLogic(
     private val context: Context,
     private val onLogout: () -> Unit = {}
 ) {
+    companion object {
+        private const val HTTP_UNAUTHORIZED = 401
+    }
     suspend fun getUser(): ProfileModel? {
         val response = userApi.getProfile(context.getString(R.string.bearer) + " " + token)
 
@@ -21,7 +24,7 @@ class ProfileLogic(
             response.body()
         } else {
             when (response.code()) {
-                401 -> {
+                HTTP_UNAUTHORIZED -> {
                     try {
                         authApi.logout()
                     } catch (e: Exception) {

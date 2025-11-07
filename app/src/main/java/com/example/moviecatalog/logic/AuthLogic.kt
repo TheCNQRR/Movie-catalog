@@ -17,6 +17,11 @@ class AuthLogic(
     private val onSuccess: () -> Unit = {},
     private val onError: (String) -> Unit = {}
 ) {
+    companion object {
+        private const val HTTP_BAD_REQUEST = 400
+        private const val HTTP_INTERNAL_SERVER_ERROR = 500
+    }
+
     suspend fun registerUser(login: String, email: String, name: String, password: String, confirmPassword: String, birthDate: String, gender: Int?) {
         onClearErrors()
 
@@ -46,8 +51,8 @@ class AuthLogic(
             onSuccess()
         } else {
             when (response.code()) {
-                400 -> onError(context.getString(R.string.check_fields_are_correct))
-                500 -> onError(context.getString(R.string.server_error))
+                HTTP_BAD_REQUEST -> onError(context.getString(R.string.check_fields_are_correct))
+                HTTP_INTERNAL_SERVER_ERROR -> onError(context.getString(R.string.server_error))
                 else -> onError(context.getString(R.string.error) + response.code())
             }
         }
@@ -70,8 +75,8 @@ class AuthLogic(
             onSuccess()
         } else {
             when (response.code()) {
-                400 -> onError(context.getString(R.string.wrong_login_or_password))
-                500 -> onError(context.getString(R.string.server_error))
+                HTTP_BAD_REQUEST -> onError(context.getString(R.string.wrong_login_or_password))
+                HTTP_INTERNAL_SERVER_ERROR -> onError(context.getString(R.string.server_error))
                 else -> onError(context.getString(R.string.error) + response.code())
             }
         }
