@@ -71,7 +71,7 @@ import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.delay
 
 @Composable
-fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick: () -> Unit, onAddReview: (String, Int, String, Boolean) -> Unit) {
+fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick: () -> Unit, onAddReview: (String, Int, String, Boolean) -> Unit, onDeleteReview: (String, String) -> Unit) {
     val scrollState = rememberScrollState()
     val progress = (scrollState.value / 150f).coerceIn(0f, 1f)
     val showDialog = remember { mutableStateOf(false) }
@@ -184,7 +184,7 @@ fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick:
 
             AboutMovie(movie)
             MovieGenres(movie)
-            Reviews(movie, user, onShowDialog = { showDialog.value = true })
+            Reviews(movie, user, onShowDialog = { showDialog.value = true }, onDeleteReview = onDeleteReview)
         }
     }
 
@@ -428,7 +428,7 @@ fun MovieGenres(movie: MovieDetailsModel) {
 }
 
 @Composable
-fun Reviews(movie: MovieDetailsModel, user: ProfileModel, onShowDialog: () -> Unit) {
+fun Reviews(movie: MovieDetailsModel, user: ProfileModel, onShowDialog: () -> Unit, onDeleteReview: (String, String) -> Unit) {
     val isUserHasReview = remember { mutableStateOf(false) }
 
     Column(
@@ -482,13 +482,13 @@ fun Reviews(movie: MovieDetailsModel, user: ProfileModel, onShowDialog: () -> Un
             .wrapContentHeight()
     ) {
         movie.reviews.forEach { review ->
-            Review(review, user)
+            Review(movie, review, user, onDeleteReview = onDeleteReview )
         }
     }
 }
 
 @Composable
-fun Review(review: ReviewModel, user: ProfileModel) {
+fun Review(movie: MovieDetailsModel, review: ReviewModel, user: ProfileModel, onDeleteReview: (String, String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -669,7 +669,7 @@ fun Review(review: ReviewModel, user: ProfileModel) {
                                     shape = CircleShape
                                 )
                                 .clickable {
-                                //TODO удалить отзыв
+                                onDeleteReview(movie.id, review.id)
                             },
                             contentAlignment = Alignment.Center
                         ) {

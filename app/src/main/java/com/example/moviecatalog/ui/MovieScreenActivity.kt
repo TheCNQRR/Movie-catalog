@@ -49,7 +49,7 @@ class MovieScreenActivity: ComponentActivity() {
                 val user = loadUserProfile(token)
                 if (user != null) {
                     setContent {
-                        MovieScreen(movie = movieDetails, user = user, onBackButtonClick = { onBackButtonClick() }, onAddReview = { movieId, rating, reviewText, isAnonymous -> onAddReview(movieId, rating, reviewText, isAnonymous) })
+                        MovieScreen(movie = movieDetails, user = user, onBackButtonClick = { onBackButtonClick() }, onAddReview = { movieId, rating, reviewText, isAnonymous -> onAddReview(movieId, rating, reviewText, isAnonymous) }, onDeleteReview = { movieId, reviewId -> onDeleteReview(movieId, reviewId) })
                     }
                 }
             }
@@ -97,13 +97,46 @@ class MovieScreenActivity: ComponentActivity() {
                     }
                 }
                 catch (e: Exception) {
-                    println(e.message)
                     Toast.makeText(this@MovieScreenActivity, e.message, Toast.LENGTH_SHORT).show()
                 }
             }
         }
         else {
             navigateToSignIn()
+        }
+    }
+
+    private fun onDeleteReview(movieId: String, reviewId: String) {
+        val token = tokenManager.getToken(this)
+
+
+        if (token != null) {
+            lifecycleScope.launch {
+                val response = reviewApi.deleteReview("Bearer ${token}", movieId, reviewId)
+
+                if (response.isSuccessful) {
+                    val movieResponse = movieApi.getMovieDetails(movieId)
+
+                    runOnUiThread {
+                        val updatedMovie = movieResponse.body()
+
+                        val intent = Intent(this@MovieScreenActivity, MovieScreenActivity::class.java).apply {
+                            putExtra("movie_details", updatedMovie)
+                        }
+                        finish()
+                        startActivity(intent)
+                    }
+                }
+                else {
+                    when (response.code()) {
+                        401 -> {
+                            navigateToSignIn()
+                            tokenManager.clearToken(this@MovieScreenActivity)
+                        }
+                        else -> Toast.makeText(this@MovieScreenActivity, getString(R.string.error) + " " + response.code(), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
     }
 
