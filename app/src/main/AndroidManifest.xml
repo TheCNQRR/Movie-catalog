@@ -16,14 +16,17 @@
         android:theme="@style/Base.Theme.MovieCatalog"
         tools:targetApi="31">
         <activity
-            android:name=".ui.SignInActivity"
+            android:name=".ui.LauncherActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.SignInActivity"
+            android:exported="false" />
 
         <activity
             android:name=".ui.SignUpActivity"
