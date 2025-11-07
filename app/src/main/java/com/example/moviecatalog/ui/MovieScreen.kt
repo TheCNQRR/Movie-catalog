@@ -35,9 +35,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -428,7 +430,9 @@ fun Review(review: ReviewModel, user: ProfileModel) {
                             )
                     ) {
                         val avatarUrl = review.author!!.avatar
-                        if (!avatarUrl.isNullOrBlank()) {
+                        println("Debug USER NAME: " + review.author.nickName)
+                        println("Debug AVATAR: " + review.author.avatar)
+                        if (!avatarUrl.isNullOrBlank() && avatarUrl != "" && !review.isAnonymous) {
                             PicassoImage(
                                 url = avatarUrl,
                                 modifier = Modifier
@@ -441,8 +445,8 @@ fun Review(review: ReviewModel, user: ProfileModel) {
                                 painter = painterResource(R.drawable.default_user_icon),
                                 contentDescription = "Default avatar",
                                 modifier = Modifier
-                                    .size(24.dp)
-                                    .align(Alignment.Center)
+                                    .size(40.dp),
+                                tint = Color.Unspecified
                             )
                         }
                     }
