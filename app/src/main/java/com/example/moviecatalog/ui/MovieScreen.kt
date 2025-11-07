@@ -860,8 +860,9 @@ fun ReviewDialog(
 
             Button(
                 onClick = {
-                    if (rating.value > 0 && reviewText.value.isNotBlank()) {
+                    if (reviewText.value.isNotBlank()) {
                         onAddReview(rating.value, reviewText.value, checkIcon.value)
+                        onDismiss()
                     }
                     else {
                         showError.value = true
