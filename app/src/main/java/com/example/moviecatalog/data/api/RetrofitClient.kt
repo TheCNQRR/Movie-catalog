@@ -48,4 +48,6 @@ object RetrofitClient {
     fun getMovieApi(): MovieApi = retrofit.create(MovieApi::class.java)
 
     fun getUserApi(): UserApi = retrofit.create(UserApi::class.java)
+
+    fun getReviewApi(): ReviewApi = retrofit.create(ReviewApi::class.java)
 }

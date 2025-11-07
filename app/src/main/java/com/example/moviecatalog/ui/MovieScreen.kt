@@ -71,7 +71,7 @@ import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.delay
 
 @Composable
-fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick: () -> Unit, onAddReview: (Int, String, Boolean) -> Unit) {
+fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick: () -> Unit, onAddReview: (String, Int, String, Boolean) -> Unit) {
     val scrollState = rememberScrollState()
     val progress = (scrollState.value / 150f).coerceIn(0f, 1f)
     val showDialog = remember { mutableStateOf(false) }
@@ -259,6 +259,7 @@ fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick:
         }
         if (showDialog.value) {
             ReviewDialog(
+                movie,
                 onAddReview = onAddReview,
                 onDismiss = { showDialog.value = false }
             )
@@ -689,7 +690,8 @@ fun Review(review: ReviewModel, user: ProfileModel) {
 
 @Composable
 fun ReviewDialog(
-    onAddReview: (Int, String, Boolean) -> Unit,
+    movie: MovieDetailsModel,
+    onAddReview: (String, Int, String, Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
     val reviewText = remember { mutableStateOf("") }
@@ -861,7 +863,7 @@ fun ReviewDialog(
             Button(
                 onClick = {
                     if (reviewText.value.isNotBlank()) {
-                        onAddReview(rating.value, reviewText.value, checkIcon.value)
+                        onAddReview(movie.id, rating.value, reviewText.value, checkIcon.value)
                         onDismiss()
                     }
                     else {
