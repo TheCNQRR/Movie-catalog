@@ -28,6 +28,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -55,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick: () -> Unit) {
     val scrollState = rememberScrollState()
     val progress = (scrollState.value / 150f).coerceIn(0f, 1f)
+    val showDialog = remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -164,7 +168,7 @@ fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick:
 
             AboutMovie(movie)
             MovieGenres(movie)
-            Reviews(movie, user)
+            Reviews(movie, user, onShowDialog = { showDialog.value = true })
         }
     }
 
@@ -234,6 +238,11 @@ fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick:
             }
 
             Spacer(modifier = Modifier.width(20.dp))
+        }
+        if (showDialog.value) {
+            ReviewDialog(
+                onDismiss = { showDialog.value = false }
+            )
         }
     }
 }
@@ -399,8 +408,7 @@ fun MovieGenres(movie: MovieDetailsModel) {
 }
 
 @Composable
-fun Reviews(movie: MovieDetailsModel, user: ProfileModel) {
-    val showDialog = remember { mutableStateOf(false) }
+fun Reviews(movie: MovieDetailsModel, user: ProfileModel, onShowDialog: () -> Unit) {
     val isUserHasReview = remember { mutableStateOf(false) }
 
     Column(
@@ -434,9 +442,7 @@ fun Reviews(movie: MovieDetailsModel, user: ProfileModel) {
 
             if (!isUserHasReview.value) {
                 IconButton(
-                    onClick = {
-                        showDialog.value = true
-                    },
+                    onClick = onShowDialog,
                     modifier = Modifier
                         .size(16.dp)
                 ) {
@@ -446,12 +452,6 @@ fun Reviews(movie: MovieDetailsModel, user: ProfileModel) {
                         tint = colorResource(R.color.accent)
                     )
                 }
-            }
-
-            if (showDialog.value) {
-                ReviewDialog(
-                    onDismiss = { showDialog.value = false }
-                )
             }
         }
     }
@@ -672,5 +672,213 @@ fun Review(review: ReviewModel, user: ProfileModel) {
 fun ReviewDialog(
     onDismiss: () -> Unit
 ) {
+    val reviewText = remember { mutableStateOf("") }
+    val checkIcon = remember { mutableStateOf(false) }
+    val rating = remember { mutableStateOf(0) }
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                colorResource(R.color.background).copy(alpha = 0.8f)
+            ),
+        contentAlignment = Alignment.Center
+    )
+    {
+        Column(
+            modifier = Modifier
+                .width(328.dp)
+                .height(383.dp)
+                .background(
+                    color = colorResource(R.color.review_background),
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 16.dp
+                )
+        ) {
+            Text(
+                text = stringResource(R.string.leave_a_review),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.white)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(24.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                repeat(10) { index ->
+                    val starIndex = index + 1
+
+                    IconButton(
+                        modifier = Modifier
+                            .size(24.dp),
+                        onClick = {
+                            rating.value = starIndex
+                        }
+                    ) {
+                        val iconStar = if (starIndex <= rating.value) {
+                            painterResource(R.drawable.star_filled)
+                        } else {
+                            painterResource(R.drawable.rating_star)
+                        }
+
+                        Box(
+                            modifier = Modifier.size(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (starIndex <= rating.value) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .background(
+                                            color = colorResource(R.color.accent).copy(alpha = 0.1f),
+                                            shape = CircleShape
+                                        )
+                                )
+                            }
+                        }
+
+                        Icon(
+                            painter = iconStar,
+                            contentDescription = "Star",
+                            modifier = Modifier.size(18.dp),
+                            tint = if (starIndex <= rating.value) {
+                                colorResource(R.color.accent)
+                            }
+                            else {
+                                colorResource(R.color.gray_faded)
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextField(
+                value = reviewText.value,
+                onValueChange = { newText -> reviewText.value = newText },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.review),
+                        fontSize = 14.sp,
+                        color = colorResource(R.color.gray_faded)
+                    )
+                },
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = colorResource(R.color.white),
+                    unfocusedContainerColor = colorResource(R.color.white),
+                    disabledContainerColor = colorResource(R.color.white),
+                    focusedTextColor = colorResource(R.color.background),
+                    unfocusedTextColor = colorResource(R.color.background),
+                    cursorColor = colorResource(R.color.background),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                textStyle = TextStyle(
+                    fontSize = 14.sp
+                ),
+                singleLine = false,
+                maxLines = Int.MAX_VALUE,
+                shape = RoundedCornerShape(6.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.anonymous_review),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = colorResource(R.color.gray_faded)
+                )
+
+                Box(
+                    modifier = Modifier
+                        .border(
+                            color = colorResource(R.color.check_box),
+                            shape = RoundedCornerShape(4.dp),
+                            width = 1.dp
+                        )
+                        .size(24.dp)
+                        .clickable { checkIcon.value = !checkIcon.value },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (checkIcon.value) {
+                        Icon(
+                            painter = painterResource(R.drawable.check_icon),
+                            contentDescription = "Check icon",
+                            modifier = Modifier
+                                .width(15.dp)
+                                .height(10.dp),
+                            tint = colorResource(R.color.accent)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+
+                },
+                shape = RoundedCornerShape(4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.accent)
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.save),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = colorResource(R.color.white),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    onDismiss()
+                },
+                shape = RoundedCornerShape(4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(32.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.review_background)
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.cancel),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = colorResource(R.color.accent),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
 }

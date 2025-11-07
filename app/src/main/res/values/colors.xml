@@ -25,4 +25,6 @@
     <color name="delete_review_background">#4C1908</color>
     <color name="edit_review_background">#3E3836</color>
     <color name="toolbar_background">#150D0B</color>
+    <color name="review_background">#282828</color>
+    <color name="check_box">#DBE5E4</color>
 </resources>

@@ -55,4 +55,9 @@
     <string name="add_review">Добавить отзыв</string>
     <string name="anonymous_user">Анонимный пользователь</string>
     <string name="my_review">мой отзыв</string>
+    <string name="leave_a_review">Оставить отзыв</string>
+    <string name="review">Отзыв</string>
+    <string name="anonymous_review">Анонимный отзыв</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
 </resources>
