@@ -49,7 +49,17 @@ class MovieScreenActivity: ComponentActivity() {
                 val user = loadUserProfile(token)
                 if (user != null) {
                     setContent {
-                        MovieScreen(movie = movieDetails, user = user, onBackButtonClick = { onBackButtonClick() }, onAddReview = { movieId, rating, reviewText, isAnonymous -> onAddReview(movieId, rating, reviewText, isAnonymous) }, onDeleteReview = { movieId, reviewId -> onDeleteReview(movieId, reviewId) })
+                        MovieScreen(
+                            movie = movieDetails,
+                            user = user,
+                            onBackButtonClick = { onBackButtonClick() },
+                            onAddReview = { movieId, rating, reviewText, isAnonymous ->
+                                onAddReview(movieId, rating, reviewText, isAnonymous) },
+                            onDeleteReview = { movieId, reviewId ->
+                                onDeleteReview(movieId, reviewId) },
+                            onEditReview = { movieId, reviewId, rating, reviewText, isAnonymous ->
+                                onEditReview(movieId, reviewId, rating, reviewText, isAnonymous) }
+                        )
                     }
                 }
             }
@@ -137,6 +147,67 @@ class MovieScreenActivity: ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun onEditReview(movieId: String, reviewId: String, rating: Int, reviewText: String, isAnonymous: Boolean) {
+        val token = tokenManager.getToken(this)
+
+        val reviewBody = ReviewModifyModel(reviewText, rating, isAnonymous)
+
+        if (token != null) {
+            lifecycleScope.launch {
+                try {
+                    val response = reviewApi.editReview("Bearer ${token}", movieId, reviewId, reviewBody)
+
+                    if (response.isSuccessful) {
+                        val movieResponse = movieApi.getMovieDetails(movieId)
+
+                        runOnUiThread {
+                            val updatedMovie = movieResponse.body()
+
+                            val intent = Intent(this@MovieScreenActivity, MovieScreenActivity::class.java).apply {
+                                putExtra("movie_details", updatedMovie)
+                            }
+                            finish()
+                            startActivity(intent)
+                        }
+                    }
+                    else {
+                        val errorBody = response.errorBody()?.string()
+
+                        when (response.code()) {
+                            400 ->
+                                if (errorBody?.contains("already had review") == true) {
+                                Toast.makeText(
+                                    this@MovieScreenActivity,
+                                    "Нельзя изменить видимость автора отзыва",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                }
+                                else {
+                                    Toast.makeText(
+                                        this@MovieScreenActivity,
+                                        "Ошибка редактирования: $errorBody",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+
+                            401 -> {
+                                navigateToSignIn()
+                                tokenManager.clearToken(this@MovieScreenActivity)
+                            }
+                            else -> Toast.makeText(this@MovieScreenActivity, getString(R.string.error) + " " + response.code(), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                catch (e: Exception) {
+                    Toast.makeText(this@MovieScreenActivity, e.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        else {
+            navigateToSignIn()
         }
     }
 

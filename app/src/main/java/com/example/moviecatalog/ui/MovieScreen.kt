@@ -1,8 +1,6 @@
 package com.example.moviecatalog.ui
 
-import android.content.Context
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -71,10 +69,16 @@ import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.delay
 
 @Composable
-fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick: () -> Unit, onAddReview: (String, Int, String, Boolean) -> Unit, onDeleteReview: (String, String) -> Unit) {
+fun MovieScreen(movie: MovieDetailsModel,
+                user: ProfileModel,
+                onBackButtonClick: () -> Unit,
+                onAddReview: (String, Int, String, Boolean) -> Unit,
+                onDeleteReview: (String, String) -> Unit,
+                onEditReview: (String, String, Int, String, Boolean) -> Unit) {
     val scrollState = rememberScrollState()
     val progress = (scrollState.value / 150f).coerceIn(0f, 1f)
     val showDialog = remember { mutableStateOf(false) }
+    val editingReview = remember { mutableStateOf<ReviewModel?>(null) }
 
     Box(
         modifier = Modifier
@@ -184,7 +188,15 @@ fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick:
 
             AboutMovie(movie)
             MovieGenres(movie)
-            Reviews(movie, user, onShowDialog = { showDialog.value = true }, onDeleteReview = onDeleteReview)
+            Reviews(
+                movie,
+                user,
+                onShowDialog = { showDialog.value = true },
+                onDeleteReview = onDeleteReview,
+                onEditReview = { review ->
+                    editingReview.value = review
+                    showDialog.value = true
+                })
         }
     }
 
@@ -260,8 +272,13 @@ fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick:
         if (showDialog.value) {
             ReviewDialog(
                 movie,
+                editingReview = editingReview.value,
                 onAddReview = onAddReview,
-                onDismiss = { showDialog.value = false }
+                onEditReview = onEditReview,
+                onDismiss = {
+                    showDialog.value = false
+                    editingReview.value = null
+                }
             )
         }
     }
@@ -428,7 +445,13 @@ fun MovieGenres(movie: MovieDetailsModel) {
 }
 
 @Composable
-fun Reviews(movie: MovieDetailsModel, user: ProfileModel, onShowDialog: () -> Unit, onDeleteReview: (String, String) -> Unit) {
+fun Reviews(
+    movie: MovieDetailsModel,
+    user: ProfileModel,
+    onShowDialog: () -> Unit,
+    onDeleteReview: (String, String) -> Unit,
+    onEditReview: (ReviewModel) -> Unit
+) {
     val isUserHasReview = remember { mutableStateOf(false) }
 
     Column(
@@ -482,13 +505,25 @@ fun Reviews(movie: MovieDetailsModel, user: ProfileModel, onShowDialog: () -> Un
             .wrapContentHeight()
     ) {
         movie.reviews.forEach { review ->
-            Review(movie, review, user, onDeleteReview = onDeleteReview )
+            Review(
+                movie,
+                review,
+                user,
+                onDeleteReview = onDeleteReview,
+                onEditReview = onEditReview
+            )
         }
     }
 }
 
 @Composable
-fun Review(movie: MovieDetailsModel, review: ReviewModel, user: ProfileModel, onDeleteReview: (String, String) -> Unit) {
+fun Review(
+    movie: MovieDetailsModel,
+    review: ReviewModel,
+    user: ProfileModel,
+    onDeleteReview: (String, String) -> Unit,
+    onEditReview: (ReviewModel) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -646,8 +681,8 @@ fun Review(movie: MovieDetailsModel, review: ReviewModel, user: ProfileModel, on
                                     shape = CircleShape
                                 )
                                 .clickable {
-                                //TODO редактировать отзыв
-                            },
+                                    onEditReview(review)
+                                           },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -691,13 +726,21 @@ fun Review(movie: MovieDetailsModel, review: ReviewModel, user: ProfileModel, on
 @Composable
 fun ReviewDialog(
     movie: MovieDetailsModel,
+    editingReview: ReviewModel?,
     onAddReview: (String, Int, String, Boolean) -> Unit,
+    onEditReview: (String, String, Int, String, Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
     val reviewText = remember { mutableStateOf("") }
     val checkIcon = remember { mutableStateOf(false) }
     val rating = remember { mutableStateOf(0) }
     val showError = remember { mutableStateOf(false) }
+
+    LaunchedEffect(editingReview) {
+        reviewText.value = editingReview?.reviewText ?: ""
+        checkIcon.value = editingReview?.isAnonymous ?: false
+        rating.value = editingReview?.rating ?: 0
+    }
 
     Box(
         modifier = Modifier
@@ -863,7 +906,12 @@ fun ReviewDialog(
             Button(
                 onClick = {
                     if (reviewText.value.isNotBlank()) {
-                        onAddReview(movie.id, rating.value, reviewText.value, checkIcon.value)
+                        if (editingReview != null) {
+                            onEditReview(movie.id, editingReview.id, rating.value, reviewText.value, checkIcon.value)
+                        }
+                        else {
+                            onAddReview(movie.id, rating.value, reviewText.value, checkIcon.value)
+                        }
                         onDismiss()
                     }
                     else {
