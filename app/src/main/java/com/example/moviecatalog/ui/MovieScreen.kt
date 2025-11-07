@@ -3,11 +3,14 @@ package com.example.moviecatalog.ui
 import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -430,8 +433,6 @@ fun Review(review: ReviewModel, user: ProfileModel) {
                             )
                     ) {
                         val avatarUrl = review.author!!.avatar
-                        println("Debug USER NAME: " + review.author.nickName)
-                        println("Debug AVATAR: " + review.author.avatar)
                         if (!avatarUrl.isNullOrBlank() && avatarUrl != "" && !review.isAnonymous) {
                             PicassoImage(
                                 url = avatarUrl,
@@ -511,7 +512,7 @@ fun Review(review: ReviewModel, user: ProfileModel) {
                     .padding(
                         start = 8.dp
                     ),
-                Arrangement.SpaceBetween
+                horizontalArrangement = if (review.createdDateTime != null) Arrangement.SpaceBetween else Arrangement.End
             ) {
                 if (review.createdDateTime != null) {
                     Text(
@@ -519,6 +520,59 @@ fun Review(review: ReviewModel, user: ProfileModel) {
                         fontSize = 12.sp,
                         color = colorResource(R.color.gray)
                     )
+                }
+                if (review.author!!.userId == user.id) {
+                    Row(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(
+                                end = 8.dp
+                            )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .background(
+                                    color = colorResource(R.color.edit_review_background),
+                                    shape = CircleShape
+                                )
+                                .clickable {
+                                //TODO редактировать отзыв
+                            },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.edit_review),
+                                contentDescription = "Edit review",
+                                modifier = Modifier
+                                    .size(8.dp),
+                                tint = colorResource(R.color.gray_faded)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .background(
+                                    color = colorResource(R.color.delete_review_background),
+                                    shape = CircleShape
+                                )
+                                .clickable {
+                                //TODO удалить отзыв
+                            },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.delete_review),
+                                contentDescription = "Delete review",
+                                modifier = Modifier
+                                    .size(8.dp),
+                                tint = colorResource(R.color.gray_faded)
+                            )
+                        }
+                    }
                 }
             }
         }

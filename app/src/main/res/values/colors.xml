@@ -22,4 +22,6 @@
     <color name="very_poor">#961f0f</color>
     <color name="awful">#962b0b</color>
     <color name="about_movie">#B3B3B3</color>
+    <color name="delete_review_background">#4C1908</color>
+    <color name="edit_review_background">#3E3836</color>
 </resources>
