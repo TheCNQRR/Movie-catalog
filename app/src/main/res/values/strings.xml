@@ -72,4 +72,5 @@
     <string name="already_had_review">already had review</string>
     <string name="forbidden_to_edit">Нельзя изменить видимость автора отзыва</string>
     <string name="edit_error">Ошибка редактирования:</string>
+    <string name="load_error">Не удалось загрузить детали фильма</string>
 </resources>

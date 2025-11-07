@@ -34,4 +34,15 @@ class Functions {
 
         return "$${result.reverse()}"
     }
+
+    fun formatDate(dateString: String): String {
+        return try {
+            val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
+            val outputFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+            val date = inputFormat.parse(dateString.substringBefore("."))
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            dateString
+        }
+    }
 }

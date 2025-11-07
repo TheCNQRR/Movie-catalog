@@ -12,6 +12,6 @@ data class ReviewModel(
     val rating: Int,
     val reviewText: String,
     val isAnonymous: Boolean,
-    val createdDateTime: String? = null,
-    val author: UserShortModel? = null
+    val createDateTime: String?,
+    val author: UserShortModel?
 ): Parcelable

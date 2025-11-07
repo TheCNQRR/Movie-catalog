@@ -323,55 +323,74 @@ fun AboutMovie(movie: MovieDetailsModel) {
                 end = 16.dp
             )
     ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            text = stringResource(R.string.about_movie),
-            fontSize = 16.sp,
-            fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
-            color = colorResource(R.color.white)
-        )
-
-        val fieldPairs = listOf(
-            Pair(stringResource(R.string.year), movie.year.toString()),
-            Pair(stringResource(R.string.country), movie.country),
-            Pair(stringResource(R.string.time), "${movie.time} мин."),
-            Pair(stringResource(R.string.tagline), "\"${movie.tagline}\""),
-            Pair(stringResource(R.string.director), movie.director),
-            Pair(stringResource(R.string.budget), Functions().formatNumber(movie.budget)),
-            Pair(stringResource(R.string.fees), Functions().formatNumber(movie.fees)),
-            Pair(stringResource(R.string.age), "${movie.ageLimit}+")
-        )
+        val fieldPairs = buildList {
+            if (movie.year != null && movie.year != 0) {
+                add(Pair(stringResource(R.string.year), movie.year.toString()))
+            }
+            if (!movie.country.isNullOrBlank()) {
+                add(Pair(stringResource(R.string.country), movie.country))
+            }
+            if (movie.time != null && movie.time != 0) {
+                add(Pair(stringResource(R.string.time), "${movie.time} мин."))
+            }
+            if (!movie.tagline.isNullOrBlank()) {
+                add(Pair(stringResource(R.string.tagline), "\"${movie.tagline}\""))
+            }
+            if (!movie.director.isNullOrBlank()) {
+                add(Pair(stringResource(R.string.director), movie.director))
+            }
+            movie.budget?.let {
+                add(Pair(stringResource(R.string.budget), Functions().formatNumber(it)))
+            }
+            movie.fees?.let {
+                add(Pair(stringResource(R.string.fees), Functions().formatNumber(it)))
+            }
+            if (movie.ageLimit != null && movie.ageLimit != 0) {
+                add(Pair(stringResource(R.string.age), "${movie.ageLimit}+"))
+            }
+        }
 
         val maxWidth = 100.dp
 
-        fieldPairs.forEachIndexed { index, (label, value) ->
-            Row(
+        if (fieldPairs.isNotEmpty()) {
+
+            Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(
-                        top = if (index == 0) 8.dp else 4.dp,
-                        bottom = 4.dp
-                    )
-            ) {
-                Text(
-                    text = label,
-                    fontSize = 12.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_medium)),
-                    color = colorResource(R.color.about_movie),
-                    modifier = Modifier.width(maxWidth),
-                    textAlign = TextAlign.Start
-                )
+                    .wrapContentHeight(),
+                text = stringResource(R.string.about_movie),
+                fontSize = 16.sp,
+                fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
+                color = colorResource(R.color.white)
+            )
 
-                Text(
-                    text = value,
-                    fontSize = 12.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_medium)),
-                    color = colorResource(R.color.white),
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Start
-                )
+            fieldPairs.forEachIndexed { index, (label, value) ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = if (index == 0) 8.dp else 4.dp,
+                            bottom = 4.dp
+                        )
+                ) {
+                    Text(
+                        text = label,
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily(Font(R.font.montserrat_medium)),
+                        color = colorResource(R.color.about_movie),
+                        modifier = Modifier.width(maxWidth),
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        text = value,
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily(Font(R.font.montserrat_medium)),
+                        color = colorResource(R.color.white),
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
         }
     }
@@ -471,7 +490,7 @@ fun Reviews(
             )
 
             movie.reviews.forEach { review ->
-                if (review.author!!.userId == user.id) {
+                if (review.author?.userId == user.id) {
                     isUserHasReview.value = true
                 }
             }
@@ -563,7 +582,7 @@ fun Review(
                             .clip(CircleShape)
                             .padding(start = 8.dp)
                     ) {
-                        val avatarUrl = review.author!!.avatar
+                        val avatarUrl = review.author?.avatar
 
                         if (!avatarUrl.isNullOrBlank() && avatarUrl != "" && !review.isAnonymous) {
                             PicassoImage(
@@ -590,12 +609,12 @@ fun Review(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = if (review.isAnonymous) stringResource(R.string.anonymous_user) else review.author!!.nickName!!,
+                            text = if (review.isAnonymous) stringResource(R.string.anonymous_user) else review.author?.nickName!!,
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(R.font.ibm_plex_sans_medium)),
                             color = colorResource(R.color.white)
                         )
-                        if (!review.isAnonymous && review.author!!.userId == user.id) {
+                        if (!review.isAnonymous && review.author?.userId == user.id) {
                             Text(
                                 text = stringResource(R.string.my_review),
                                 fontSize = 12.sp,
@@ -643,17 +662,18 @@ fun Review(
                     .padding(
                         start = 8.dp
                     ),
-                horizontalArrangement = if (review.createdDateTime != null) Arrangement.SpaceBetween else Arrangement.End
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = if (review.createDateTime != null) Arrangement.SpaceBetween else Arrangement.End
             ) {
-                if (review.createdDateTime != null) {
+                if (review.createDateTime != null) {
                     Text(
-                        text = review.createdDateTime,
+                        text = Functions().formatDate(review.createDateTime),
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.ibm_plex_sans_regular)),
                         color = colorResource(R.color.gray)
                     )
                 }
-                if (review.author!!.userId == user.id) {
+                if (review.author?.userId == user.id) {
                     Row(
                         modifier = Modifier
                             .wrapContentSize()

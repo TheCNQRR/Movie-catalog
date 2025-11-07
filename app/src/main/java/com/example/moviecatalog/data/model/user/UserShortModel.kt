@@ -8,6 +8,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserShortModel(
     val userId: String,
-    val nickName: String? = null,
-    val avatar: String? = null
+    val nickName: String,
+    val avatar: String?
 ): Parcelable

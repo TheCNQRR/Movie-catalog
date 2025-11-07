@@ -28,21 +28,29 @@ class MainScreenActivity: AppCompatActivity() {
 
     private val galleryAdapter = GalleryAdapter { movie ->
         lifecycleScope.launch {
+            println("🟡 Loading movie details for: ${movie.name} (ID: ${movie.id})")
+
             val moviesLogic = MoviesLogic(
                 context = this@MainScreenActivity,
                 movieApi = RetrofitClient.getMovieApi(),
                 onMoviesLoaded = {},
                 onMovieDetailsLoaded = { details ->
+                    println("✅ Successfully loaded movie details: ${details!!.name}")
                     runOnUiThread {
                         val intent = Intent(this@MainScreenActivity, MovieScreenActivity::class.java).apply {
-                            putExtra("movie_details", details)
+                            putExtra(getString(R.string.movie_details), details)
                         }
                         startActivity(intent)
                     }
                 },
-                onError = { error ->
+                onError = { errorMessage ->
+                    println("❌ Error loading movie details: $errorMessage")
                     runOnUiThread {
-                        Toast.makeText(this@MainScreenActivity, "Не удалось загрузить детали фильма", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@MainScreenActivity,
+                            "Ошибка загрузки: $errorMessage",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             )
