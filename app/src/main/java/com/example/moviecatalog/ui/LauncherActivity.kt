@@ -8,8 +8,6 @@ import com.example.moviecatalog.logic.util.TokenManager
 
 class LauncherActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
-
         super.onCreate(savedInstanceState)
 
         val tokenManager = TokenManager()

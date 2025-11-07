@@ -3,6 +3,7 @@
         <item name="materialCalendarTheme">@style/ThemeOverlay.MovieCatalog.DatePicker</item>
     </style>
 
+    <style name="Theme.MovieCatalog" parent="Base.Theme.MovieCatalog" />
 
     <style name="ThemeOverlay.MovieCatalog.DatePicker"
         parent="ThemeOverlay.Material3.MaterialCalendar">
@@ -10,5 +11,11 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorOnSurface">@color/white</item>
         <item name="android:colorBackground">@color/date_picker_background</item>
+    </style>
+
+    <style name="Theme.MovieCatalog.Splash" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_screen_background</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 </resources>
