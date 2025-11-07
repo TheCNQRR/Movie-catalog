@@ -41,7 +41,7 @@ class MovieScreenActivity: ComponentActivity() {
                 val user = loadUserProfile(token)
                 if (user != null) {
                     setContent {
-                        MovieScreen(movie = movieDetails, user = user, onBackButtonClick = { onBackButtonClick() })
+                        MovieScreen(movie = movieDetails, user = user, onBackButtonClick = { onBackButtonClick() }, onAddReview = { rating, reviewText, isAnonymous -> onAddReview(rating, reviewText, isAnonymous) })
                     }
                 }
             }
@@ -53,6 +53,10 @@ class MovieScreenActivity: ComponentActivity() {
 
     private fun onBackButtonClick() {
         finish()
+    }
+
+    private fun onAddReview(rating: Int, reviewText: String, isAnonymous: Boolean) {
+
     }
 
     private suspend fun loadUserProfile(token: String): ProfileModel? {

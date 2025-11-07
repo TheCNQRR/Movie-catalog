@@ -1,6 +1,14 @@
 package com.example.moviecatalog.ui
 
+import android.content.Context
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +31,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -31,12 +41,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -53,9 +67,11 @@ import com.example.moviecatalog.data.model.review.ReviewModel
 import com.example.moviecatalog.data.model.user.ProfileModel
 import com.squareup.picasso.Picasso
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.delay
 
 @Composable
-fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick: () -> Unit) {
+fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick: () -> Unit, onAddReview: (Int, String, Boolean) -> Unit) {
     val scrollState = rememberScrollState()
     val progress = (scrollState.value / 150f).coerceIn(0f, 1f)
     val showDialog = remember { mutableStateOf(false) }
@@ -222,7 +238,9 @@ fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick:
             )
 
             IconButton(
-                onClick = {  },
+                onClick = {
+                    //TODO добавление фильма в избранное
+                },
                 modifier = Modifier
                     .size(24.dp)
                     .background(
@@ -241,6 +259,7 @@ fun MovieScreen(movie: MovieDetailsModel, user: ProfileModel, onBackButtonClick:
         }
         if (showDialog.value) {
             ReviewDialog(
+                onAddReview = onAddReview,
                 onDismiss = { showDialog.value = false }
             )
         }
@@ -670,11 +689,13 @@ fun Review(review: ReviewModel, user: ProfileModel) {
 
 @Composable
 fun ReviewDialog(
+    onAddReview: (Int, String, Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
     val reviewText = remember { mutableStateOf("") }
     val checkIcon = remember { mutableStateOf(false) }
     val rating = remember { mutableStateOf(0) }
+    val showError = remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -726,7 +747,8 @@ fun ReviewDialog(
                     ) {
                         val iconStar = if (starIndex <= rating.value) {
                             painterResource(R.drawable.star_filled)
-                        } else {
+                        }
+                        else {
                             painterResource(R.drawable.rating_star)
                         }
 
@@ -838,7 +860,12 @@ fun ReviewDialog(
 
             Button(
                 onClick = {
-
+                    if (rating.value > 0 && reviewText.value.isNotBlank()) {
+                        onAddReview(rating.value, reviewText.value, checkIcon.value)
+                    }
+                    else {
+                        showError.value = true
+                    }
                 },
                 shape = RoundedCornerShape(4.dp),
                 modifier = Modifier
@@ -878,6 +905,77 @@ fun ReviewDialog(
                     color = colorResource(R.color.accent),
                     textAlign = TextAlign.Center
                 )
+            }
+        }
+        if (showError.value) {
+            ErrorNotification(
+                message = stringResource(R.string.fill_all_fields),
+                onDismiss = { showError.value = false }
+            )
+        }
+    }
+}
+
+@Composable
+fun ErrorNotification(
+    message: String,
+    onDismiss: () -> Unit
+) {
+    var visible by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        delay(5000)
+        visible = false
+        delay(300)
+        onDismiss()
+    }
+
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(animationSpec = tween(300)) + scaleIn(animationSpec = tween(300)),
+        exit = fadeOut(animationSpec = tween(300)) + scaleOut(animationSpec = tween(300))
+    ) {
+        Dialog(onDismissRequest = { onDismiss() }) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .shadow(8.dp, RoundedCornerShape(16.dp))
+                    .background(color = colorResource(R.color.error))
+                    .padding(24.dp)
+                    .wrapContentSize()
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(color = colorResource(R.color.white))
+                            .clickable { onDismiss() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.error),
+                            tint = colorResource(R.color.error),
+                            modifier = Modifier
+                                .size(24.dp)
+                                .align(Alignment.Center)
+                        )
+                    }
+                    Text(
+                        text = message,
+                        style = TextStyle(
+                            color = colorResource(R.color.white),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
+                        ),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
             }
         }
     }
