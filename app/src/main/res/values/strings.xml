@@ -73,4 +73,7 @@
     <string name="forbidden_to_edit">Нельзя изменить видимость автора отзыва</string>
     <string name="edit_error">Ошибка редактирования:</string>
     <string name="load_error">Не удалось загрузить детали фильма</string>
+    <string name="email_profile">E-mail</string>
+    <string name="gender">Пол</string>
+    <string name="logout">Выйти из аккаунта</string>
 </resources>
