@@ -25,12 +25,10 @@ class CollectionScreenActivity : AppCompatActivity() {
     private var collections: List<CollectionModel> = emptyList()
     private val effects = Effects()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = CollectionScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
 
         setupWindow()
         setupWindowInsest()
