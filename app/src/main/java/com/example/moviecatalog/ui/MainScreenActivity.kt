@@ -82,6 +82,7 @@ class MainScreenActivity : AppCompatActivity() {
         initializeMovieLogic()
         loadFirstPage()
         setupGalleryScrollListener()
+        setupProfileClickListener()
     }
 
     private fun initializeMovieLogic() {
@@ -257,5 +258,20 @@ class MainScreenActivity : AppCompatActivity() {
                 loadNextPage()
             }
         }
+    }
+
+    private fun setupProfileClickListener() {
+        binding.mainScreenProfile.setOnClickListener {
+            startProfileScreen()
+        }
+        binding.profileTextInMainScreen.setOnClickListener {
+            startProfileScreen()
+        }
+    }
+
+    private fun startProfileScreen() {
+        val intent = Intent(this, ProfileScreenActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

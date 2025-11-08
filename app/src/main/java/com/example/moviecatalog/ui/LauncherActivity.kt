@@ -3,7 +3,6 @@ package com.example.moviecatalog.ui
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.moviecatalog.logic.util.TokenManager
 
 class LauncherActivity : ComponentActivity() {
