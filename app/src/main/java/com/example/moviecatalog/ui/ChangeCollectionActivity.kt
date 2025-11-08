@@ -8,7 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.moviecatalog.databinding.ChangeCollecttionScreenBinding
 
-class ChangeCollectionActivity: AppCompatActivity() {
+class ChangeCollectionActivity : AppCompatActivity() {
     private lateinit var binding: ChangeCollecttionScreenBinding
     private val effects = Effects()
     override fun onCreate(savedInstanceState: Bundle?) {
