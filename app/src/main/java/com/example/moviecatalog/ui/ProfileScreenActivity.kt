@@ -38,6 +38,7 @@ class ProfileScreenActivity : AppCompatActivity() {
         setupBinding()
         setupWindowInsest()
         bindingSetOnCliclListener(binding)
+        navigateToMainScreenListener()
 
         var user: ProfileModel
 
@@ -120,8 +121,23 @@ class ProfileScreenActivity : AppCompatActivity() {
         }
     }
 
+    private fun navigateToMainScreenListener() {
+        binding.profileScreenTv.setOnClickListener {
+            startMainScreen()
+        }
+        binding.mainTextInProfileScreen.setOnClickListener {
+            startMainScreen()
+        }
+    }
+
     private fun navigateToSignIn() {
         val intent = Intent(this, SignInActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun startMainScreen() {
+        val intent = Intent(this, MainScreenActivity::class.java)
         startActivity(intent)
         finish()
     }

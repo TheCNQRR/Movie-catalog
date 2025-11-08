@@ -273,7 +273,6 @@ class MainScreenActivity : AppCompatActivity() {
     private fun setupOnPromotedMovieClickListener(movie: MovieElementModel) {
         binding.watchPromoted.setOnClickListener {
             if (currentMovies.isNotEmpty()) {
-
                 lifecycleScope.launch {
                     val moviesLogic = MoviesLogic(
                         context = this@MainScreenActivity,
