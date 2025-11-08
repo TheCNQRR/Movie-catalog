@@ -76,4 +76,6 @@
     <string name="email_profile">E-mail</string>
     <string name="gender">Пол</string>
     <string name="logout">Выйти из аккаунта</string>
+    <string name="collections_storage">encrypted_collections_storage</string>
+    <string name="user_collections">user_collections_key</string>
 </resources>

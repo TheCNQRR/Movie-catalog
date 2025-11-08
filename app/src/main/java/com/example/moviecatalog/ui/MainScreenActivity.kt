@@ -96,6 +96,7 @@ class MainScreenActivity : AppCompatActivity() {
         loadFirstPage()
         setupGalleryScrollListener()
         setupProfileClickListener()
+        setupCollectionClickListener()
     }
 
     override fun onResume() {
@@ -397,6 +398,15 @@ class MainScreenActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupCollectionClickListener() {
+        binding.starTextInMainScreen.setOnClickListener {
+            startCollectionsScreen()
+        }
+        binding.mainScreenStar.setOnClickListener {
+            startCollectionsScreen()
+        }
+    }
+
     private fun setupOnPromotedMovieClickListener(movie: MovieElementModel) {
         binding.watchPromoted.setOnClickListener {
             if (currentMovies.isNotEmpty()) {
@@ -466,6 +476,12 @@ class MainScreenActivity : AppCompatActivity() {
 
     private fun startProfileScreen() {
         val intent = Intent(this, ProfileScreenActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun startCollectionsScreen() {
+        val intent = Intent(this, CollectionScreenActivity::class.java)
         startActivity(intent)
         finish()
     }
