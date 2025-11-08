@@ -154,6 +154,7 @@ class MainScreenActivity : AppCompatActivity() {
             showPoster(firstMovie)
             currentMovies = currentMovies.filterIndexed { index, _ -> index != ZERO }
             addMoviesToGallery(currentMovies)
+            setupOnPromotedMovieClickListener(firstMovie)
         }
         setupFavoriteMovies(emptyList()) // TODO передавать избранное пользователя
     }
@@ -266,6 +267,39 @@ class MainScreenActivity : AppCompatActivity() {
         }
         binding.profileTextInMainScreen.setOnClickListener {
             startProfileScreen()
+        }
+    }
+
+    private fun setupOnPromotedMovieClickListener(movie: MovieElementModel) {
+        binding.watchPromoted.setOnClickListener {
+            if (currentMovies.isNotEmpty()) {
+
+                lifecycleScope.launch {
+                    val moviesLogic = MoviesLogic(
+                        context = this@MainScreenActivity,
+                        movieApi = RetrofitClient.getMovieApi(),
+                        onMoviesLoaded = {},
+                        onMovieDetailsLoaded = { details ->
+                            runOnUiThread {
+                                val intent = Intent(this@MainScreenActivity, MovieScreenActivity::class.java).apply {
+                                    putExtra(getString(R.string.movie_details), details)
+                                }
+                                startActivity(intent)
+                            }
+                        },
+                        onError = { _ ->
+                            runOnUiThread {
+                                Toast.makeText(
+                                    this@MainScreenActivity,
+                                    getString(R.string.load_error),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    )
+                    moviesLogic.getMovieDetails(movie.id)
+                }
+            }
         }
     }
 
