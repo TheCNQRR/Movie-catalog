@@ -6,10 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.model.CollectionModel
 import com.example.moviecatalog.databinding.CollectionScreenBinding
@@ -20,16 +23,34 @@ class CollectionScreenActivity : AppCompatActivity() {
     private lateinit var binding: CollectionScreenBinding
     private val collectionsManager = CollectionsManager()
     private var collections: List<CollectionModel> = emptyList()
+    private val effects = Effects()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = CollectionScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+        setupWindow()
+        setupWindowInsest()
         loadCollections()
         setOnMainScrenClick()
         setOnProfileScreenClick()
         setOnCreateOrChangeListener()
+    }
+
+    private fun setupWindow() {
+        window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        effects.hideSystemBars(window)
+    }
+
+    private fun setupWindowInsest() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
     }
 
     private fun loadCollections() {
