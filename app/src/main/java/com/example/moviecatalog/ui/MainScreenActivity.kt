@@ -1,31 +1,72 @@
 package com.example.moviecatalog.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.data.model.movie.MovieElementModel
 import com.example.moviecatalog.databinding.MainScreenBinding
 import com.example.moviecatalog.logic.MoviesLogic
-import com.example.moviecatalog.logic.util.Functions
+import com.example.moviecatalog.logic.util.TokenManager
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
-import java.util.Locale
 
-class MainScreenActivity: AppCompatActivity() {
+class MainScreenActivity : AppCompatActivity() {
+    companion object {
+        private const val NORMAL_SCALE = 1f
+        private const val SMALL_SCALE = 0.83f
+        private const val PADDING = 500
+        private const val ZERO = 0
+        private const val DURATION = 150L
+        private const val HTTP_UNAUTHORIZED = 401
+    }
     private lateinit var binding: MainScreenBinding
     private val effects = Effects()
     private lateinit var moviesLogic: MoviesLogic
+    private val tokenManager = TokenManager()
+    private val retrofitClient = RetrofitClient
+    private val favoriteMoviesApi = retrofitClient.getFavoritesApi()
+    private var favoriteMovies: List<MovieElementModel> = emptyList()
+
+    private val galleryAdapter = GalleryAdapter { movie ->
+        lifecycleScope.launch {
+            val moviesLogic = MoviesLogic(
+                context = this@MainScreenActivity,
+                movieApi = RetrofitClient.getMovieApi(),
+                onMoviesLoaded = {},
+                onMovieDetailsLoaded = { details ->
+                    runOnUiThread {
+                        val intent = Intent(this@MainScreenActivity, MovieScreenActivity::class.java).apply {
+                            putExtra(getString(R.string.movie_details), details)
+                        }
+                        startActivity(intent)
+                    }
+                },
+                onError = { _ ->
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@MainScreenActivity,
+                            getString(R.string.load_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            )
+            moviesLogic.getMovieDetails(movie.id)
+        }
+    }
 
     private var currentPage = 1
     private var currentMovies = emptyList<MovieElementModel>()
@@ -44,9 +85,25 @@ class MainScreenActivity: AppCompatActivity() {
 
         effects.hideSystemBars(window)
 
+        val token = tokenManager.getToken(this)
+        if (token == null) {
+            navigateToSignIn()
+            return
+        }
+
+        setupRecyclerView()
         initializeMovieLogic()
         loadFirstPage()
         setupGalleryScrollListener()
+        setupProfileClickListener()
+        setupCollectionClickListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            loadFavorites()
+        }
     }
 
     private fun initializeMovieLogic() {
@@ -60,8 +117,7 @@ class MainScreenActivity: AppCompatActivity() {
                     hasMorePages = true
                     isFirstLoad = false
                     setUpUI()
-                }
-                else {
+                } else {
                     if (movies.isNotEmpty()) {
                         currentMovies = currentMovies + movies
                         currentPage++
@@ -107,23 +163,30 @@ class MainScreenActivity: AppCompatActivity() {
     }
 
     private fun showPoster(promotedMovie: MovieElementModel) {
-            Picasso.get()
-                .load(promotedMovie.poster)
-                .fit()
-                .into(binding.moviePoster)
+        Picasso.get()
+            .load(promotedMovie.poster)
+            .fit()
+            .into(binding.moviePoster)
     }
 
     private fun setUpUI() {
         if (currentMovies.isNotEmpty()) {
             val firstMovie = currentMovies.first()
             showPoster(firstMovie)
-            currentMovies = currentMovies.filterIndexed { index, _ -> index != 0 }
+            currentMovies = currentMovies.filterIndexed { index, _ -> index != ZERO }
             addMoviesToGallery(currentMovies)
+            setupOnPromotedMovieClickListener(firstMovie)
         }
-        setupFavoriteMovies(emptyList()) //TODO передавать избранное пользователя
+        lifecycleScope.launch {
+            loadFavorites()
+        }
     }
 
     private fun setupFavoriteMovies(favoriteMovies: List<MovieElementModel>) {
+        val container = binding.moviesContainer
+
+        container.removeAllViews()
+
         if (favoriteMovies.isEmpty()) {
             binding.favoritesTextInMain.visibility = View.GONE
             binding.horizontalScrollForMovies.visibility = View.GONE
@@ -134,8 +197,6 @@ class MainScreenActivity: AppCompatActivity() {
 
             return
         }
-
-        val container = binding.moviesContainer
 
         binding.favoritesTextInMain.visibility = View.VISIBLE
         binding.horizontalScrollForMovies.visibility = View.VISIBLE
@@ -153,11 +214,16 @@ class MainScreenActivity: AppCompatActivity() {
 
             val cardView = movieView.findViewById<CardView>(R.id.card_view)
             val poster = movieView.findViewById<ImageView>(R.id.movie_poster)
+            val deleteIcon = movieView.findViewById<ImageView>(R.id.delete_icon)
 
-            cardView.scaleX = 1f
-            cardView.scaleY = 1f
+            cardView.scaleX = NORMAL_SCALE
+            cardView.scaleY = NORMAL_SCALE
 
             Picasso.get().load(movie.poster).into(poster)
+
+            setupFavoriteMovieClickListener(movie, cardView)
+
+            setupDeleteClickListener(movie, deleteIcon, container, movieView)
 
             container.addView(movieView)
         }
@@ -171,11 +237,109 @@ class MainScreenActivity: AppCompatActivity() {
         }
     }
 
+    private fun setupDeleteClickListener(
+        movie: MovieElementModel,
+        deleteIcon: ImageView,
+        container: View,
+        movieView: View
+    ) {
+        deleteIcon.setOnClickListener {
+            deleteFromFavorites(movie, container, movieView)
+        }
+    }
+
+    private fun deleteFromFavorites(
+        movie: MovieElementModel,
+        container: View,
+        movieView: View
+    ) {
+        val token = tokenManager.getToken(this)
+        if (token != null) {
+            lifecycleScope.launch {
+                try {
+                    // ОТПРАВЛЯЕМ API ЗАПРОС НА УДАЛЕНИЕ
+                    val response = favoriteMoviesApi.deleteFavorite(
+                        getString(R.string.bearer) + " " + token,
+                        movie.id
+                    )
+
+                    if (response.isSuccessful) {
+                        runOnUiThread {
+                            (container as? ViewGroup)?.removeView(movieView)
+
+                            favoriteMovies = favoriteMovies.filter { it.id != movie.id }
+
+                            if (favoriteMovies.isEmpty()) {
+                                setupFavoriteMovies(emptyList())
+                            } else {
+                                updateCenterItem()
+                            }
+                        }
+                    } else {
+                        runOnUiThread {
+                            when (response.code()) {
+                                HTTP_UNAUTHORIZED -> {
+                                    navigateToSignIn()
+                                    tokenManager.clearToken(this@MainScreenActivity)
+                                }
+                                else -> Toast.makeText(
+                                    this@MainScreenActivity,
+                                    getString(R.string.error) + " " + response.code(),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@MainScreenActivity,
+                            getString(R.string.error) + " " + e.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        } else {
+            navigateToSignIn()
+        }
+    }
+
+    private fun setupFavoriteMovieClickListener(movie: MovieElementModel, cardView: CardView) {
+        cardView.setOnClickListener {
+            lifecycleScope.launch {
+                val moviesLogic = MoviesLogic(
+                    context = this@MainScreenActivity,
+                    movieApi = RetrofitClient.getMovieApi(),
+                    onMoviesLoaded = {},
+                    onMovieDetailsLoaded = { details ->
+                        runOnUiThread {
+                            val intent = Intent(this@MainScreenActivity, MovieScreenActivity::class.java).apply {
+                                putExtra(getString(R.string.movie_details), details)
+                            }
+                            startActivity(intent)
+                        }
+                    },
+                    onError = { _ ->
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@MainScreenActivity,
+                                getString(R.string.load_error),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                )
+                moviesLogic.getMovieDetails(movie.id)
+            }
+        }
+    }
+
     private fun updateCenterItem() {
         val scrollView = binding.horizontalScrollForMovies
         val container = binding.moviesContainer
 
-        var firstVisiblePosition = 0
+        var firstVisiblePosition = ZERO
         var minLeft = Int.MAX_VALUE
 
         for (i in 0 until container.childCount) {
@@ -189,63 +353,27 @@ class MainScreenActivity: AppCompatActivity() {
             }
         }
 
-        for (i in 0 until container.childCount) {
+        for (i in ZERO until container.childCount) {
             val cardView = container.getChildAt(i) as CardView
-            val scale = if (i == firstVisiblePosition) 1f else 0.83f
+            val scale = if (i == firstVisiblePosition) NORMAL_SCALE else SMALL_SCALE
 
             cardView.animate()
                 .scaleX(scale)
                 .scaleY(scale)
-                .setDuration(150)
+                .setDuration(DURATION)
                 .start()
         }
     }
 
-    private fun addMoviesToGallery(movies: List<MovieElementModel>) {
-        val container = binding.galleryContainer
-
-        movies.forEach { movie ->
-            val movieView = LayoutInflater.from(this).inflate(
-                R.layout.movie_item_in_gallery,
-                container,
-                false
-            )
-
-            val poster = movieView.findViewById<ImageView>(R.id.movie_poster)
-            val name = movieView.findViewById<TextView>(R.id.movie_name_main_screen)
-            val yearCountry = movieView.findViewById<TextView>(R.id.movie_year_country_main_screen)
-            val genres = movieView.findViewById<TextView>(R.id.movie_genres_main_screen)
-            val rating = movieView.findViewById<TextView>(R.id.movie_rating_main_screen)
-
-            val movieRating = Functions().calculateMovieRating(movie)
-
-            val ratingBackground = when {
-                movieRating > 9 && movieRating <= 10 -> R.drawable.rating_masterprice
-                movieRating > 8 && movieRating <= 9 -> R.drawable.rating_excellent
-                movieRating > 7 && movieRating <= 8 -> R.drawable.rating_very_good
-                movieRating > 6 && movieRating <= 7-> R.drawable.rating_good
-                movieRating > 5 && movieRating <= 6 -> R.drawable.rating_decent
-                movieRating > 4 && movieRating <= 5 -> R.drawable.rating_average
-                movieRating > 3 &&  movieRating <= 4 -> R.drawable.rating_below_average
-                movieRating > 2 && movieRating <= 3 -> R.drawable.rating_poor
-                movieRating > 1 && movieRating <= 2 -> R.drawable.rating_very_poor
-                movieRating in 0.0..1.0 -> R.drawable.rating_awful
-                else -> R.drawable.rating_gray
-            }
-
-            name.isSelected = true
-            yearCountry.isSelected = true
-            genres.isSelected = true
-
-            Picasso.get().load(movie.poster).into(poster)
-            name.text = movie.name
-            yearCountry.text = getString(R.string.year_country_format, movie.year, movie.country)
-            genres.text = movie.genres.joinToString { it.name }
-            rating.text = String.format(Locale.getDefault(), "%.1f", movieRating)
-            rating.setBackgroundResource(ratingBackground)
-
-            container.addView(movieView)
+    private fun setupRecyclerView() {
+        binding.galleryContainer.apply {
+            layoutManager = LinearLayoutManager(this@MainScreenActivity)
+            adapter = galleryAdapter
         }
+    }
+
+    private fun addMoviesToGallery(movies: List<MovieElementModel>) {
+        galleryAdapter.addMovies(movies)
     }
 
     private fun setupGalleryScrollListener() {
@@ -255,9 +383,106 @@ class MainScreenActivity: AppCompatActivity() {
             val galleryContainer = binding.galleryContainer
             val galleryBottom = galleryContainer.bottom
 
-            if (galleryBottom <= scrollView.height + scrollView.scrollY + 500) {
+            if (galleryBottom <= scrollView.height + scrollView.scrollY + PADDING) {
                 loadNextPage()
             }
         }
+    }
+
+    private fun setupProfileClickListener() {
+        binding.mainScreenProfile.setOnClickListener {
+            startProfileScreen()
+        }
+        binding.profileTextInMainScreen.setOnClickListener {
+            startProfileScreen()
+        }
+    }
+
+    private fun setupCollectionClickListener() {
+        binding.starTextInMainScreen.setOnClickListener {
+            startCollectionsScreen()
+        }
+        binding.mainScreenStar.setOnClickListener {
+            startCollectionsScreen()
+        }
+    }
+
+    private fun setupOnPromotedMovieClickListener(movie: MovieElementModel) {
+        binding.watchPromoted.setOnClickListener {
+            if (currentMovies.isNotEmpty()) {
+                lifecycleScope.launch {
+                    val moviesLogic = MoviesLogic(
+                        context = this@MainScreenActivity,
+                        movieApi = RetrofitClient.getMovieApi(),
+                        onMoviesLoaded = {},
+                        onMovieDetailsLoaded = { details ->
+                            runOnUiThread {
+                                val intent = Intent(this@MainScreenActivity, MovieScreenActivity::class.java).apply {
+                                    putExtra(getString(R.string.movie_details), details)
+                                }
+                                startActivity(intent)
+                            }
+                        },
+                        onError = { _ ->
+                            runOnUiThread {
+                                Toast.makeText(
+                                    this@MainScreenActivity,
+                                    getString(R.string.load_error),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    )
+                    moviesLogic.getMovieDetails(movie.id)
+                }
+            }
+        }
+    }
+
+    private suspend fun loadFavorites() {
+        val token = tokenManager.getToken(this)
+        if (token != null) {
+            try {
+                val response = favoriteMoviesApi.getFavorites(getString(R.string.bearer) + " " + token)
+                if (response.isSuccessful) {
+                    favoriteMovies = response.body()!!.movies
+                    runOnUiThread {
+                        setupFavoriteMovies(favoriteMovies)
+                    }
+                } else {
+                    when (response.code()) {
+                        HTTP_UNAUTHORIZED -> {
+                            navigateToSignIn()
+                            tokenManager.clearToken(this@MainScreenActivity)
+                        }
+                        else -> {
+                            favoriteMovies = emptyList()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                favoriteMovies = emptyList()
+            }
+        } else {
+            navigateToSignIn()
+        }
+    }
+
+    private fun navigateToSignIn() {
+        val intent = Intent(this, SignInActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun startProfileScreen() {
+        val intent = Intent(this, ProfileScreenActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun startCollectionsScreen() {
+        val intent = Intent(this, CollectionScreenActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

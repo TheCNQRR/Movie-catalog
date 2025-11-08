@@ -13,17 +13,21 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Base.Theme.MovieCatalog"
+        android:theme="@style/Theme.MovieCatalog"
         tools:targetApi="31">
         <activity
-            android:name=".ui.SignInActivity"
-            android:exported="true">
+            android:name=".ui.LauncherActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MovieCatalog.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.SignInActivity"
+            android:exported="false" />
 
         <activity
             android:name=".ui.SignUpActivity"
@@ -31,6 +35,26 @@
 
         <activity
             android:name=".ui.MainScreenActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.MovieScreenActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.ProfileScreenActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.CollectionScreenActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.CreateCollectionActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.ChangeCollectionActivity"
             android:exported="false" />
     </application>
     <uses-permission android:name="android.permission.INTERNET" />

@@ -9,7 +9,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -22,14 +21,13 @@ import com.example.moviecatalog.logic.util.TokenManager
 import com.example.moviecatalog.logic.util.Validator
 import kotlinx.coroutines.launch
 
-class SignInActivity: AppCompatActivity() {
+class SignInActivity : AppCompatActivity() {
     private lateinit var binding: SignInScreenBinding
     private val effects = Effects()
     private val validator = Validator(this)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -107,8 +105,8 @@ class SignInActivity: AppCompatActivity() {
 
     private fun setupTextWatcher() {
         val textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
             override fun afterTextChanged(s: Editable?) {
                 checkFieldsAndUpdateButton()
             }

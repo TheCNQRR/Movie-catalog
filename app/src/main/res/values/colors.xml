@@ -21,4 +21,12 @@
     <color name="poor">#d40000</color>
     <color name="very_poor">#961f0f</color>
     <color name="awful">#962b0b</color>
+    <color name="about_movie">#B3B3B3</color>
+    <color name="delete_review_background">#4C1908</color>
+    <color name="edit_review_background">#3E3836</color>
+    <color name="toolbar_background">#150D0B</color>
+    <color name="review_background">#282828</color>
+    <color name="check_box">#DBE5E4</color>
+    <color name="close_background">#D6DDE3</color>
+    <color name="collection_name">#A8A8A8</color>
 </resources>

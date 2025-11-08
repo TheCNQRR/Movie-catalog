@@ -30,7 +30,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/register_in_the_app"
+                android:id="@+id/watch_promoted"
                 android:layout_width="0dp"
                 android:layout_height="44dp"
                 android:layout_marginStart="108dp"
@@ -100,7 +100,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/horizontal_scroll_for_movies" />
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/gallery_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -163,7 +163,7 @@
         app:srcCompat="@drawable/bottom_panel_star"
         android:layout_marginStart="168dp"
         android:layout_marginEnd="168dp"
-        app:tint="@color/white" />
+        app:tint="@color/gray" />
 
     <TextView
         android:id="@+id/star_text_in_main_screen"
@@ -190,7 +190,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/bottom_panel_profile"
-        app:tint="@color/white" />
+        app:tint="@color/gray" />
 
     <TextView
         android:id="@+id/profile_text_in_main_screen"

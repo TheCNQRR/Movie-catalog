@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
@@ -29,7 +31,9 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -56,6 +60,10 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.security.crypto)
     implementation(libs.picasso)
+    implementation(libs.androidx.runtime.android)
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.material.icons.extended)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -13,4 +13,23 @@
         android:scaleType="centerCrop"
         android:layout_marginStart="16dp"/>
 
+    <FrameLayout
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="104dp"
+        android:background="@drawable/circle_background">
+
+        <ImageView
+            android:id="@+id/delete_icon"
+            android:layout_width="5dp"
+            android:layout_height="5dp"
+            android:layout_gravity="center"
+            android:src="@drawable/remove_from_favorites"
+            android:scaleType="fitCenter" />
+
+    </FrameLayout>
+
 </androidx.cardview.widget.CardView>
