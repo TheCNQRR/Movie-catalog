@@ -66,6 +66,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.model.movie.MovieDetailsModel
+import com.example.moviecatalog.data.model.movie.MovieElementModel
 import com.example.moviecatalog.data.model.review.ReviewModel
 import com.example.moviecatalog.data.model.user.ProfileModel
 import com.example.moviecatalog.logic.util.Functions
@@ -79,12 +80,15 @@ fun MovieScreen(
     onBackButtonClick: () -> Unit,
     onAddReview: (String, Int, String, Boolean) -> Unit,
     onDeleteReview: (String, String) -> Unit,
-    onEditReview: (String, String, Int, String, Boolean) -> Unit
+    onEditReview: (String, String, Int, String, Boolean) -> Unit,
+    favorites: List<MovieElementModel>,
+    onAddToFavoriteClick: (String) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val progress = (scrollState.value / 150f).coerceIn(0f, 1f)
     val showDialog = remember { mutableStateOf(false) }
     val editingReview = remember { mutableStateOf<ReviewModel?>(null) }
+    val inFavorites = remember(favorites) { mutableStateOf(favorites.any { it.id == movie.id }) }
 
     Box(
         modifier = Modifier
@@ -264,11 +268,13 @@ fun MovieScreen(
                         shape = CircleShape
                     ),
                 onClick = {
-                    // TODO добавление фильма в избранное
-                },
+                    onAddToFavoriteClick(movie.id)
+                    inFavorites.value = !inFavorites.value },
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.toolbar_add_to_favorite),
+                    modifier = Modifier
+                        .size(20.dp),
+                    painter = if (!inFavorites.value) painterResource(R.drawable.toolbar_add_to_favorite) else painterResource(R.drawable.heart_filled),
                     contentDescription = stringResource(R.string.favourite),
                     tint = colorResource(R.color.accent)
                 )

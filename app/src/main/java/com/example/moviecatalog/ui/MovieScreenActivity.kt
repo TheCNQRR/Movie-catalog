@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.moviecatalog.R
 import com.example.moviecatalog.data.api.RetrofitClient
 import com.example.moviecatalog.data.model.movie.MovieDetailsModel
+import com.example.moviecatalog.data.model.movie.MovieElementModel
 import com.example.moviecatalog.data.model.review.ReviewModifyModel
 import com.example.moviecatalog.data.model.user.ProfileModel
 import com.example.moviecatalog.logic.ProfileLogic
@@ -29,6 +30,8 @@ class MovieScreenActivity : ComponentActivity() {
     private val authApi = retrofitClient.getAuthApi()
     private val reviewApi = retrofitClient.getReviewApi()
     private val movieApi = retrofitClient.getMovieApi()
+    private val favoriteMoviesApi = retrofitClient.getFavoritesApi()
+    private var favoriteMovies: List<MovieElementModel> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -50,6 +53,21 @@ class MovieScreenActivity : ComponentActivity() {
 
         if (token != null) {
             lifecycleScope.launch {
+                getFavorites()
+            }
+        } else {
+            navigateToSignIn()
+        }
+
+        setMovieScreenContent(movieDetails)
+    }
+
+    private fun setMovieScreenContent(movieDetails: MovieDetailsModel) {
+        val token = tokenManager.getToken(this)
+
+        if (token != null) {
+            lifecycleScope.launch {
+                getFavorites()
                 val user = loadUserProfile(token)
 
                 if (user != null) {
@@ -66,6 +84,10 @@ class MovieScreenActivity : ComponentActivity() {
                             },
                             onEditReview = { movieId, reviewId, rating, reviewText, isAnonymous ->
                                 onEditReview(movieId, reviewId, rating, reviewText, isAnonymous)
+                            },
+                            favoriteMovies,
+                            onAddToFavoriteClick = { movieId ->
+                                onAddToFavorites(movieId)
                             }
                         )
                     }
@@ -219,6 +241,132 @@ class MovieScreenActivity : ComponentActivity() {
             }
         } else {
             navigateToSignIn()
+        }
+    }
+
+    private suspend fun getFavorites() {
+        val token = tokenManager.getToken(this)
+
+        if (token != null) {
+            try {
+                val response = favoriteMoviesApi.getFavorites(getString(R.string.bearer) + " " + token)
+
+                if (response.isSuccessful) {
+                    favoriteMovies = response.body()!!.movies
+                } else {
+                    when (response.code()) {
+                        HTTP_UNAUTHORIZED -> {
+                            navigateToSignIn()
+                            tokenManager.clearToken(this@MovieScreenActivity)
+                        }
+                        else -> Toast.makeText(
+                            this@MovieScreenActivity,
+                            getString(R.string.error) + " " + response.code(),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@MovieScreenActivity, e.message, Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            navigateToSignIn()
+        }
+    }
+
+    private fun onAddToFavorites(movieId: String) {
+        val token = tokenManager.getToken(this)
+        var flag = false
+
+        if (token != null) {
+            favoriteMovies.forEach { favoriteMovie ->
+                if (favoriteMovie.id == movieId) {
+                    flag = true
+                }
+            }
+            if (!flag) {
+                lifecycleScope.launch {
+                    try {
+                        val response = favoriteMoviesApi.addFavorite(getString(R.string.bearer) + " " + token, movieId)
+
+                        if (response.isSuccessful) {
+                            reloadMovieScreen(movieId)
+                        } else {
+                            when (response.code()) {
+                                HTTP_UNAUTHORIZED -> {
+                                    navigateToSignIn()
+                                    tokenManager.clearToken(this@MovieScreenActivity)
+                                }
+                                else -> Toast.makeText(
+                                    this@MovieScreenActivity,
+                                    getString(R.string.error) + " " + response.code(),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(this@MovieScreenActivity, e.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                lifecycleScope.launch {
+                    try {
+                        val response = favoriteMoviesApi.deleteFavorite(getString(R.string.bearer) + " " + token, movieId)
+
+                        if (response.isSuccessful) {
+                            reloadMovieScreen(movieId)
+                        } else {
+                            when (response.code()) {
+                                HTTP_UNAUTHORIZED -> {
+                                    navigateToSignIn()
+                                    tokenManager.clearToken(this@MovieScreenActivity)
+                                }
+                                else -> Toast.makeText(
+                                    this@MovieScreenActivity,
+                                    getString(R.string.error) + " " + response.code(),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(this@MovieScreenActivity, e.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } else {
+            navigateToSignIn()
+        }
+    }
+
+    private fun reloadMovieScreen(movieId: String) {
+        lifecycleScope.launch {
+            try {
+                val movieResponse = movieApi.getMovieDetails(movieId)
+
+                if (movieResponse.isSuccessful) {
+                    runOnUiThread {
+                        val updatedMovie = movieResponse.body()
+
+                        val intent = Intent(this@MovieScreenActivity, MovieScreenActivity::class.java).apply {
+                            putExtra(getString(R.string.movie_details), updatedMovie)
+                        }
+                        finish()
+                        startActivity(intent)
+                    }
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@MovieScreenActivity,
+                            getString(R.string.load_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this@MovieScreenActivity, e.message, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

@@ -16,9 +16,9 @@ interface FavoriteMoviesApi {
 
     @Headers("Content-type: application/json")
     @POST("api/favorites/{id}/add")
-    suspend fun addFavorite(@Header("Authorization") token: String, @Path("id") id: Long): Response<Unit>
+    suspend fun addFavorite(@Header("Authorization") token: String, @Path("id") id: String): Response<Unit>
 
     @Headers("Content-type: application/json")
     @DELETE("api/favorites/{id}/delete")
-    suspend fun deleteFavorite(@Header("Authorization") token: String, @Path("id") id: Long): Response<Unit>
+    suspend fun deleteFavorite(@Header("Authorization") token: String, @Path("id") id: String): Response<Unit>
 }

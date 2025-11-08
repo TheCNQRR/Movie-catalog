@@ -53,4 +53,6 @@ object RetrofitClient {
     fun getUserApi(): UserApi = retrofit.create(UserApi::class.java)
 
     fun getReviewApi(): ReviewApi = retrofit.create(ReviewApi::class.java)
+
+    fun getFavoritesApi(): FavoriteMoviesApi = retrofit.create(FavoriteMoviesApi::class.java)
 }
