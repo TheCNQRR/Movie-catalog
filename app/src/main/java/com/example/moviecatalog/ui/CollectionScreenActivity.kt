@@ -29,6 +29,7 @@ class CollectionScreenActivity : AppCompatActivity() {
         loadCollections()
         setOnMainScrenClick()
         setOnProfileScreenClick()
+        setOnCreateOrChangeListener()
     }
 
     private fun loadCollections() {
@@ -66,6 +67,12 @@ class CollectionScreenActivity : AppCompatActivity() {
     private fun setupCollectionView(view: View, collection: CollectionModel) {
         val avatar = view.findViewById<ImageView>(R.id.collection_avatar)
         val name = view.findViewById<TextView>(R.id.collection_name)
+        val goToIcon = view.findViewById<ImageView>(R.id.go_to_collection)
+
+        goToIcon.setOnClickListener {
+            val intent = Intent(this, ChangeCollectionActivity::class.java)
+            startActivity(intent)
+        }
 
         loadCollectionAvatar(avatar, collection)
         name.text = collection.name
@@ -113,5 +120,12 @@ class CollectionScreenActivity : AppCompatActivity() {
         val intent = Intent(this, ProfileScreenActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    private fun setOnCreateOrChangeListener() {
+        binding.addIcon.setOnClickListener {
+            val intent = Intent(this, CreateCollectionActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

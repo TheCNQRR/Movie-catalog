@@ -172,28 +172,6 @@ fun MovieScreen(
                     color = colorResource(R.color.white),
                     textAlign = TextAlign.Center
                 )
-
-//            DropdownMenu(
-//                expanded = expanded.value,
-//                onDismissRequest = { expanded.value = false },
-//                modifier = Modifier.background(Color.Black)
-//            ) {
-//                collectionsList.forEach { collection ->
-//                    DropdownMenuItem(
-//                        text = {
-//                            Text(
-//                                text = collection.,
-//                                color = Color.White,
-//                                modifier = Modifier.fillMaxWidth()
-//                            )
-//                        },
-//                        onClick = {
-//                            //TODO обработать выбор
-//                            expanded.value = false
-//                        }
-//                    )
-//                }
-//            }
             }
 
             AboutMovie(movie)

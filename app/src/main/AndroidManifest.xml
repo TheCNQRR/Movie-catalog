@@ -48,6 +48,14 @@
         <activity
             android:name=".ui.CollectionScreenActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.CreateCollectionActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.ChangeCollectionActivity"
+            android:exported="false" />
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

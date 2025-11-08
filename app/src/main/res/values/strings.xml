@@ -78,4 +78,8 @@
     <string name="logout">Выйти из аккаунта</string>
     <string name="collections_storage">encrypted_collections_storage</string>
     <string name="user_collections">user_collections_key</string>
+    <string name="create_collection">Создать коллекцию</string>
+    <string name="edit_collection">Изменить коллекцию</string>
+    <string name="collection_name">Название</string>
+    <string name="choose_icon">Выбрать иконку</string>
 </resources>
