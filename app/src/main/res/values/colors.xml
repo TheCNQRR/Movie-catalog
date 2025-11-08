@@ -27,4 +27,5 @@
     <color name="toolbar_background">#150D0B</color>
     <color name="review_background">#282828</color>
     <color name="check_box">#DBE5E4</color>
+    <color name="close_background">#D6DDE3</color>
 </resources>
